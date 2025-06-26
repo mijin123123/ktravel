@@ -1,16 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+
+// 메뉴 데이터 타입을 정의합니다.
+interface SubCategory {
+  name: string;
+  order: string;
+}
+
+interface MenuCategory {
+  name: string;
+  url: string;
+  order: string;
+  sub?: SubCategory[];
+}
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuData, setMenuData] = useState<MenuCategory[]>([]);
   const location = useLocation();
   
-  const navigation = [
-    { name: '홈', href: '/' },
-    { name: '여행 패키지', href: '/packages' },
-    { name: '회사 소개', href: '/about' },
-    { name: '문의하기', href: '/contact' },
-  ];
+  useEffect(() => {
+    const savedMenuData = localStorage.getItem('menuCategories');
+    if (savedMenuData) {
+      try {
+        const parsedData = JSON.parse(savedMenuData);
+        // url 속성이 없는 경우를 대비하여 / 로 기본값을 설정해줍니다.
+        const validatedData = parsedData.map((item: any) => ({...item, url: item.url || '/'}));
+        setMenuData(validatedData);
+      } catch (error) {
+        console.error("Failed to parse menu data from localStorage", error);
+        // 파싱 실패 시 기본 메뉴를 사용합니다.
+        setMenuData(getDefaultMenu());
+      }
+    } else {
+      // localStorage에 데이터가 없을 경우 기본 메뉴를 사용합니다.
+      setMenuData(getDefaultMenu());
+    }
+  }, []);
+
+  const getDefaultMenu = (): MenuCategory[] => {
+    return [
+      { name: '홈', url: '/', order: '1' },
+      { name: '해외여행', url: '/packages', order: '2' },
+      { name: '호텔', url: '/hotels', order: '3' },
+      { name: '회사소개', url: '/about', order: '4' },
+      { name: '문의하기', url: '/contact', order: '5' },
+    ];
+  };
   
   const isActive = (path: string) => location.pathname === path;
 
@@ -28,12 +64,12 @@ const Header = () => {
           {/* 데스크탑 네비게이션 */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-4">
-              {navigation.map((item) => (
+              {menuData.map((item) => (
                 <Link
                   key={item.name}
-                  to={item.href}
+                  to={item.url}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isActive(item.href)
+                    isActive(item.url)
                       ? 'bg-primary-50 text-primary-700'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
@@ -89,12 +125,12 @@ const Header = () => {
       {/* 모바일 메뉴 */}
       <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          {navigation.map((item) => (
+          {menuData.map((item) => (
             <Link
               key={item.name}
-              to={item.href}
+              to={item.url}
               className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive(item.href)
+                isActive(item.url)
                   ? 'bg-primary-50 text-primary-700'
                   : 'text-gray-700 hover:bg-gray-100'
               }`}

@@ -13,99 +13,105 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // HTML 내부 스크립트에서 menuCategories가 재정의되어 있을 수 있으므로 여기서 명시적으로 다시 정의
-    window.menuCategories = [
-        {
-            name: "베스트",
-            url: "best.html",
-            order: "1",
-            sub: [
-                { name: "유럽", order: "1" },
-                { name: "아시아", order: "2" },
-                { name: "미국", order: "3" },
-                { name: "오세아니아", order: "4" }
-            ]
-        },
-        {
-            name: "해외여행",
-            url: "packages.html",
-            order: "2",
-            sub: [
-                { name: "가족 여행", order: "1" },
-                { name: "신혼 여행", order: "2" },
-                { name: "친구 여행", order: "3" },
-                { name: "단체 여행", order: "4" }
-            ]
-        },
-        {
-            name: "호텔",
-            url: "hotels.html",
-            order: "3",
-            sub: [
-                { name: "5성급 호텔", order: "1" },
-                { name: "리조트", order: "2" },
-                { name: "풀빌라", order: "3" }
-            ]
-        },
-        {
-            name: "투어/입장권",
-            url: "tours-tickets.html",
-            order: "4",
-            sub: [
-                { name: "명소 입장권", order: "1" },
-                { name: "액티비티", order: "2" },
-                { name: "시티투어", order: "3" }
-            ]
-        },
-        {
-            name: "국내숙소",
-            url: "domestic.html",
-            order: "5",
-            sub: [
-                { name: "제주도", order: "1" },
-                { name: "부산", order: "2" },
-                { name: "강원도", order: "3" },
-                { name: "경상도", order: "4" }
-            ]
-        },
-        {
-            name: "골프",
-            url: "golf.html",
-            order: "6",
-            sub: [
-                { name: "국내 골프", order: "1" },
-                { name: "해외 골프", order: "2" }
-            ]
-        },
-        {
-            name: "테마여행",
-            url: "theme.html",
-            order: "7",
-            sub: [
-                { name: "크루즈", order: "1" },
-                { name: "사파리", order: "2" },
-                { name: "투어", order: "3" }
-            ]
-        },
-        {
-            name: "맞춤여행",
-            url: "custom.html",
-            order: "8",
-            sub: [
-                { name: "개인 맞춤", order: "1" },
-                { name: "기업 맞춤", order: "2" }
-            ]
-        },
-        {
-            name: "이달의 혜택",
-            url: "benefits.html",
-            order: "9",
-            sub: [
-                { name: "특가 상품", order: "1" },
-                { name: "시즌 혜택", order: "2" }
-            ]
-        }
-    ];
+    // localStorage에서 데이터 불러오기를 시도하고, 없으면 기본값 사용
+    const savedCategories = localStorage.getItem('menuCategories');
+    if (savedCategories) {
+        window.menuCategories = JSON.parse(savedCategories);
+    } else {
+        // 기본 메뉴 데이터
+        window.menuCategories = [
+            {
+                name: "베스트",
+                url: "best.html",
+                order: "1",
+                sub: [
+                    { name: "유럽", order: "1" },
+                    { name: "아시아", order: "2" },
+                    { name: "미국", order: "3" },
+                    { name: "오세아니아", order: "4" }
+                ]
+            },
+            {
+                name: "해외여행",
+                url: "packages.html",
+                order: "2",
+                sub: [
+                    { name: "가족 여행", order: "1" },
+                    { name: "신혼 여행", order: "2" },
+                    { name: "친구 여행", order: "3" },
+                    { name: "단체 여행", order: "4" }
+                ]
+            },
+            {
+                name: "호텔",
+                url: "hotels.html",
+                order: "3",
+                sub: [
+                    { name: "5성급 호텔", order: "1" },
+                    { name: "리조트", order: "2" },
+                    { name: "풀빌라", order: "3" }
+                ]
+            },
+            {
+                name: "투어/입장권",
+                url: "tours-tickets.html",
+                order: "4",
+                sub: [
+                    { name: "명소 입장권", order: "1" },
+                    { name: "액티비티", order: "2" },
+                    { name: "시티투어", order: "3" }
+                ]
+            },
+            {
+                name: "국내숙소",
+                url: "domestic.html",
+                order: "5",
+                sub: [
+                    { name: "제주도", order: "1" },
+                    { name: "부산", order: "2" },
+                    { name: "강원도", order: "3" },
+                    { name: "경상도", order: "4" }
+                ]
+            },
+            {
+                name: "골프",
+                url: "golf.html",
+                order: "6",
+                sub: [
+                    { name: "국내 골프", order: "1" },
+                    { name: "해외 골프", order: "2" }
+                ]
+            },
+            {
+                name: "테마여행",
+                url: "theme.html",
+                order: "7",
+                sub: [
+                    { name: "크루즈", order: "1" },
+                    { name: "사파리", order: "2" },
+                    { name: "투어", order: "3" }
+                ]
+            },
+            {
+                name: "맞춤여행",
+                url: "custom.html",
+                order: "8",
+                sub: [
+                    { name: "개인 맞춤", order: "1" },
+                    { name: "기업 맞춤", order: "2" }
+                ]
+            },
+            {
+                name: "이달의 혜택",
+                url: "benefits.html",
+                order: "9",
+                sub: [
+                    { name: "특가 상품", order: "1" },
+                    { name: "시즌 혜택", order: "2" }
+                ]
+            }
+        ];
+    }
 
     const pageTitle = document.getElementById('page-title');
     const sections = document.querySelectorAll('.admin-section');
@@ -173,6 +179,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const menuForm = document.getElementById('menu-category-form');
     const menuList = document.getElementById('menu-category-list');
     let editIdx = null;
+
+    // 변경된 메뉴 데이터를 localStorage에 저장하고 다시 렌더링하는 함수
+    function saveAndRenderMenu() {
+        // 저장하기 전에 순서(order)에 따라 정렬
+        window.menuCategories.sort((a, b) => a.order - b.order);
+        window.menuCategories.forEach(cat => {
+            if (cat.sub && cat.sub.length > 0) {
+                cat.sub.sort((a, b) => a.order - b.order);
+            }
+        });
+
+        localStorage.setItem('menuCategories', JSON.stringify(window.menuCategories));
+        renderMenu();
+    }
 
     function renderMenu() {
         const openSubMenuId = document.querySelector('tr[id^="sub-"]:not(.hidden)')?.id;
@@ -265,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (target.matches('.del-menu')) {
             if (confirm(`'${window.menuCategories[i].name}' 메뉴를 삭제하시겠습니까? 모든 하위 카테고리도 함께 삭제됩니다.`)) {
                 window.menuCategories.splice(i, 1);
-                renderMenu();
+                saveAndRenderMenu();
             }
         } else if (target.matches('.toggle-sub')) {
             const subRow = document.getElementById(`sub-${i}`);
@@ -287,13 +307,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (target.matches('.del-sub')) {
             if (confirm(`'${window.menuCategories[ci].sub[si].name}' 서브카테고리를 삭제하시겠습니까?`)) {
                 window.menuCategories[ci].sub.splice(si, 1);
-                renderMenu();
+                saveAndRenderMenu();
             }
         } else if (target.matches('.save-sub')) {
             const container = target.closest('.flex');
             const [nameInput, orderInput] = container.querySelectorAll('input');
             window.menuCategories[ci].sub[si] = { name: nameInput.value, order: orderInput.value };
-            renderMenu();
+            saveAndRenderMenu();
         } else if (target.matches('.cancel-sub')) {
             renderMenu();
         }
@@ -324,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
         menuForm.reset();
         document.getElementById('menu-form-title').textContent = "새 메뉴 카테고리 추가";
         document.getElementById('menu-form-submit').textContent = "추가하기";
-        renderMenu();
+        saveAndRenderMenu();
     });
     
     document.getElementById('menu-form-cancel').addEventListener('click', () => {
@@ -352,7 +372,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!category.sub) category.sub = [];
             category.sub.push({ name, order });
             
-            renderMenu();
+            saveAndRenderMenu();
         }
     });
 
