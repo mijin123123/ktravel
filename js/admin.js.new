@@ -1,0 +1,165 @@
+document.addEventListener('DOMContentLoaded', function() {
+    // 인증 체크
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+        const password = prompt("관리자 비밀번호를 입력하세요:", "");
+        if (password === "admin123") {
+            localStorage.setItem('adminLoggedIn', 'true');
+        } else {
+            alert("비밀번호가 틀렸습니다.");
+            document.body.innerHTML = `<div class="p-8 text-center text-red-500">접근이 거부되었습니다.</div>`;
+            return;
+        }
+    }
+
+    // 필요한 요소 가져오기
+    const pageTitle = document.getElementById('page-title');
+    const sections = document.querySelectorAll('.admin-section');
+    const navLinks = document.querySelectorAll('.nav-link[data-section]');
+
+    // 각 링크에 클릭 이벤트 추가
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const targetSectionId = this.getAttribute('data-section');
+            if (!targetSectionId) return;
+            
+            // 모든 섹션 숨기기
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 모든 네비게이션 링크 비활성화
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // 선택된 섹션 보이기
+            const targetSection = document.getElementById(targetSectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // 선택된 네비게이션 링크 활성화
+            this.classList.add('active');
+            
+            // 페이지 타이틀 업데이트
+            if (this.querySelector('span')) {
+                pageTitle.textContent = this.querySelector('span').textContent;
+            }
+            
+            // 카테고리 관리 섹션인 경우 특별 처리
+            if (targetSectionId === 'categories-section') {
+                initCategoryTabs();
+            }
+        });
+    });
+
+    // 카테고리 관리 섹션 내부 탭 초기화
+    function initCategoryTabs() {
+        const menuCatBtn = document.getElementById('menu-cat-btn');
+        const countryCatBtn = document.getElementById('country-cat-btn');
+        const menuCategorySection = document.getElementById('menu-category-section');
+        const countryCategorySection = document.getElementById('country-category-section');
+        
+        // 기본값 - 메뉴 카테고리 탭 활성화
+        menuCategorySection.classList.remove('hidden');
+        countryCategorySection.classList.add('hidden');
+        
+        menuCatBtn.classList.add('border-blue-600', 'text-blue-600');
+        menuCatBtn.classList.remove('border-transparent', 'text-gray-500');
+        
+        countryCatBtn.classList.remove('border-blue-600', 'text-blue-600');
+        countryCatBtn.classList.add('border-transparent', 'text-gray-500');
+        
+        // 하위 탭 이벤트 설정
+        setupCategoryTabEvents();
+    }
+    
+    // 각 카테고리 탭에 이벤트 설정
+    function setupCategoryTabEvents() {
+        const menuCatBtn = document.getElementById('menu-cat-btn');
+        const countryCatBtn = document.getElementById('country-cat-btn');
+        const countryTabBtn = document.getElementById('country-tab-btn');
+        const cityTabBtn = document.getElementById('city-tab-btn');
+        
+        const menuCategorySection = document.getElementById('menu-category-section');
+        const countryCategorySection = document.getElementById('country-category-section');
+        const countryManagement = document.getElementById('country-management');
+        const cityManagement = document.getElementById('city-management');
+        
+        // 메뉴 카테고리 탭 클릭
+        menuCatBtn.addEventListener('click', function() {
+            menuCategorySection.classList.remove('hidden');
+            countryCategorySection.classList.add('hidden');
+            
+            this.classList.add('border-blue-600', 'text-blue-600');
+            this.classList.remove('border-transparent', 'text-gray-500');
+            
+            countryCatBtn.classList.remove('border-blue-600', 'text-blue-600');
+            countryCatBtn.classList.add('border-transparent', 'text-gray-500');
+        });
+        
+        // 국가/지역 카테고리 탭 클릭
+        countryCatBtn.addEventListener('click', function() {
+            menuCategorySection.classList.add('hidden');
+            countryCategorySection.classList.remove('hidden');
+            
+            this.classList.add('border-blue-600', 'text-blue-600');
+            this.classList.remove('border-transparent', 'text-gray-500');
+            
+            menuCatBtn.classList.remove('border-blue-600', 'text-blue-600');
+            menuCatBtn.classList.add('border-transparent', 'text-gray-500');
+            
+            // 국가/지역 섹션 내부 탭 기본값
+            countryManagement.classList.remove('hidden');
+            cityManagement.classList.add('hidden');
+            
+            countryTabBtn.classList.add('border-blue-600', 'text-blue-600');
+            countryTabBtn.classList.remove('border-transparent', 'text-gray-500');
+            
+            cityTabBtn.classList.remove('border-blue-600', 'text-blue-600');
+            cityTabBtn.classList.add('border-transparent', 'text-gray-500');
+        });
+        
+        // 국가 관리 탭 클릭
+        countryTabBtn.addEventListener('click', function() {
+            countryManagement.classList.remove('hidden');
+            cityManagement.classList.add('hidden');
+            
+            this.classList.add('border-blue-600', 'text-blue-600');
+            this.classList.remove('border-transparent', 'text-gray-500');
+            
+            cityTabBtn.classList.remove('border-blue-600', 'text-blue-600');
+            cityTabBtn.classList.add('border-transparent', 'text-gray-500');
+        });
+        
+        // 도시 관리 탭 클릭
+        cityTabBtn.addEventListener('click', function() {
+            cityManagement.classList.remove('hidden');
+            countryManagement.classList.add('hidden');
+            
+            this.classList.add('border-blue-600', 'text-blue-600');
+            this.classList.remove('border-transparent', 'text-gray-500');
+            
+            countryTabBtn.classList.remove('border-blue-600', 'text-blue-600');
+            countryTabBtn.classList.add('border-transparent', 'text-gray-500');
+        });
+    }
+
+    // 로그아웃 버튼 이벤트 설정
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('adminLoggedIn');
+            alert('로그아웃 되었습니다.');
+            window.location.href = 'index.html';
+        });
+    }
+
+    // 기본 섹션 (대시보드) 표시
+    const defaultLink = document.querySelector('.nav-link[data-section="dashboard-section"]');
+    if (defaultLink) {
+        defaultLink.classList.add('active');
+    }
+});

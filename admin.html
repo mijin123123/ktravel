@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRIP STORE - 관리자 페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+        }
+        .layout-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #1f2937;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #f3f4f6;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #d1d5db;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        .nav-link:hover {
+            background-color: #374151;
+            color: white;
+        }
+        .nav-link.active {
+            background-color: #2d3748; /* 약간 어두운 배경색 추가 */
+            color: #ffffff; /* 텍스트 색상을 밝게 */
+            font-weight: 600; /* 글자 두껍게 */
+            border-left: 3px solid #3b82f6; /* 왼쪽 테두리로 활성화된 메뉴 표시 */
+        }
+        .admin-section {
+            display: none;
+            padding: 20px;
+        }
+        .admin-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="p-5">
+                <h1 class="text-xl font-bold">Admin Panel</h1>
+            </div>
+            <nav class="flex-grow">
+                <a href="#" class="nav-link active" data-section="dashboard-section">
+                    <i class="fas fa-tachometer-alt w-6"></i>
+                    <span class="ml-3">대시보드</span>
+                </a>
+                <a href="#" class="nav-link" data-section="members-section">
+                    <i class="fas fa-users w-6"></i>
+                    <span class="ml-3">회원 관리</span>
+                </a>
+                <a href="#" class="nav-link" data-section="categories-section" id="categories-nav-link">
+                    <i class="fas fa-tags w-6"></i>
+                    <span class="ml-3">카테고리 관리</span>
+                </a>
+                <a href="#" class="nav-link" data-section="accounts-section">
+                    <i class="fas fa-university w-6"></i>
+                    <span class="ml-3">계좌 관리</span>
+                </a>
+                <a href="#" class="nav-link" data-section="reservations-section">
+                    <i class="fas fa-calendar-check w-6"></i>
+                    <span class="ml-3">예약 관리</span>
+                </a>
+                <a href="#" class="nav-link" data-section="packages-section">
+                    <i class="fas fa-box-open w-6"></i>
+                    <span class="ml-3">상품 관리</span>
+                </a>
+                <a href="#" class="nav-link" data-section="footer-section">
+                    <i class="fas fa-info-circle w-6"></i>
+                    <span class="ml-3">푸터 정보 수정</span>
+                </a>
+            </nav>
+            <div class="mt-auto p-4 border-t border-gray-700">
+                <a href="index.html" class="nav-link" id="go-to-site">
+                    <i class="fas fa-home w-6"></i>
+                    <span class="ml-3">사이트로 돌아가기</span>
+                </a>
+                <button id="logout-btn" class="nav-link w-full text-left">
+                    <i class="fas fa-sign-out-alt w-6"></i>
+                    <span class="ml-3">로그아웃</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <h2 id="page-title" class="text-xl font-semibold">대시보드</h2>
+                <div>
+                    <span class="text-gray-600">관리자님, 환영합니다.</span>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="admin-section active p-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">관리자 대시보드</h3>
+                    <p class="text-gray-600">좌측 메뉴를 통해 카테고리 또는 푸터 정보를 관리할 수 있습니다.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                        <div class="bg-blue-100 p-6 rounded-lg flex items-center">
+                            <div class="rounded-full bg-blue-200 p-3 mr-4">
+                                <i class="fas fa-users text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-blue-600">총 사용자</p>
+                                <p class="text-2xl font-bold">2,345</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-100 p-6 rounded-lg flex items-center">
+                            <div class="rounded-full bg-green-200 p-3 mr-4">
+                                <i class="fas fa-box text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-green-600">여행 패키지</p>
+                                <p class="text-2xl font-bold">48</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-purple-100 p-6 rounded-lg flex items-center">
+                            <div class="rounded-full bg-purple-200 p-3 mr-4">
+                                <i class="fas fa-credit-card text-purple-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-purple-600">총 예약</p>
+                                <p class="text-2xl font-bold">156</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Categories Section -->
+            <section id="categories-section" class="admin-section p-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">카테고리 관리</h3>
+
+                    <!-- 카테고리 타입 전환 탭 -->
+                    <div class="border-b border-gray-200">
+                        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                            <button id="menu-cat-btn" class="border-blue-600 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                                메뉴 카테고리
+                            </button>
+                            <button id="country-cat-btn" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                                국가/지역 관리
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- 메뉴 카테고리 관리 섹션 -->
+                    <div id="menu-category-section" class="mt-6">
+                        <div class="mb-6">
+                            <!-- 메뉴 카테고리 폼 -->
+                            <form id="menu-category-form" class="flex gap-4 items-end mb-4">
+                                <div class="flex-grow">
+                                    <label for="menu-category-name" class="block text-sm font-medium text-gray-700">메뉴 이름</label>
+                                    <input type="text" id="menu-category-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                                </div>
+                                <div>
+                                    <label for="menu-category-url" class="block text-sm font-medium text-gray-700">URL 경로</label>
+                                    <input type="text" id="menu-category-url" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required placeholder="예: best.html">
+                                </div>
+                                <div class="flex-none">
+                                    <label for="menu-category-order" class="block text-sm font-medium text-gray-700">순서</label>
+                                    <input type="number" id="menu-category-order" min="1" class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm p-2 border" required>
+                                </div>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">저장</button>
+                            </form>
+                        </div>
+
+                        <!-- 메뉴 카테고리 테이블 -->
+                        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg mb-8">
+                            <table class="min-w-full divide-y divide-gray-300">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">순서</th>
+                                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">메뉴 이름</th>
+                                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">URL 경로</th>
+                                        <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                            <span class="sr-only">Actions</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 bg-white" id="menu-category-list">
+                                    <!-- 메뉴 카테고리 목록이 동적으로 렌더링됩니다 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 국가/지역 관리 섹션 -->
+                    <div id="country-category-section" class="mt-6 hidden">
+                        <!-- 국가/지역 전환 탭 -->
+                        <div class="border-b border-gray-200 mb-6">
+                            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                                <button id="country-tab-btn" class="border-blue-600 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                                    국가 관리
+                                </button>
+                                <button id="city-tab-btn" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                                    지역/도시 관리
+                                </button>
+                            </nav>
+                        </div>
+
+                        <!-- 국가 관리 섹션 -->
+                        <div id="country-management" class="mb-6">
+                            <!-- 국가 카테고리 폼 -->
+                            <form id="category-form" class="flex gap-4 items-end mb-4">
+                                <div class="flex-grow">
+                                    <label for="category-name" class="block text-sm font-medium text-gray-700">국가 이름</label>
+                                    <input type="text" id="category-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                                </div>
+                                <div class="flex-none">
+                                    <label for="category-order" class="block text-sm font-medium text-gray-700">순서</label>
+                                    <input type="number" id="category-order" min="1" class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm p-2 border" required>
+                                </div>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">저장</button>
+                            </form>
+                            
+                            <!-- 국가 카테고리 테이블 -->
+                            <div id="main-category-table" class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg mb-8">
+                                <table class="min-w-full divide-y divide-gray-300">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">순서</th>
+                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">국가 이름</th>
+                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">지역/도시 수</th>
+                                            <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                                <span class="sr-only">Actions</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 bg-white" id="category-list">
+                                        <!-- 여기에 카테고리 목록이 동적으로 렌더링됩니다 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- 지역/도시 관리 섹션 -->
+                        <div id="city-management" class="mb-6 hidden">
+                            <!-- 서브 카테고리 폼 -->
+                            <form id="sub-category-form" class="flex gap-4 items-end mb-4">
+                                <div>
+                                    <label for="parent-category" class="block text-sm font-medium text-gray-700">국가</label>
+                                    <select id="parent-category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                                        <option value="">국가 선택</option>
+                                    </select>
+                                </div>
+                                <div class="flex-grow">
+                                    <label for="sub-category-name" class="block text-sm font-medium text-gray-700">지역/도시 이름</label>
+                                    <input type="text" id="sub-category-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                                </div>
+                                <div class="flex-none">
+                                    <label for="sub-category-order" class="block text-sm font-medium text-gray-700">순서</label>
+                                    <input type="number" id="sub-category-order" min="1" class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm p-2 border" required>
+                                </div>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">추가</button>
+                            </form>
+                            
+                            <!-- 서브 카테고리 테이블 -->
+                            <div id="sub-category-table" class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                                <table class="min-w-full divide-y divide-gray-300">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">순서</th>
+                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">국가</th>
+                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">지역/도시 이름</th>
+                                            <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                                <span class="sr-only">Actions</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white" id="sub-category-list">
+                                <!-- 여기에 서브카테고리 목록이 동적으로 렌더링됩니다 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 계좌 관리 섹션 -->
+            <section id="accounts-section" class="admin-section p-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">무통장 입금 계좌 관리</h3>
+                    
+                    <div class="mb-6">
+                        <form id="account-form" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label for="bank-name" class="block text-sm font-medium text-gray-700">은행명</label>
+                                    <input type="text" id="bank-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                                </div>
+                                <div>
+                                    <label for="account-number" class="block text-sm font-medium text-gray-700">계좌번호</label>
+                                    <input type="text" id="account-number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                                </div>
+                                <div>
+                                    <label for="account-holder" class="block text-sm font-medium text-gray-700">예금주</label>
+                                    <input type="text" id="account-holder" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                                </div>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">계좌 추가</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-300">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">은행명</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">계좌번호</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">예금주</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">사용여부</th>
+                                    <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                        <span class="sr-only">Actions</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white" id="account-list">
+                                <!-- 계좌 목록이 동적으로 렌더링됩니다 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-6 p-4 bg-blue-50 rounded-md">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-600"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-blue-800">안내사항</h3>
+                                <div class="mt-2 text-sm text-blue-700">
+                                    <ul class="list-disc pl-5 space-y-1">
+                                        <li>무통장 입금만 가능하도록 설정되어 있습니다.</li>
+                                        <li>사용 중인 계좌만 결제 페이지에 표시됩니다.</li>
+                                        <li>계좌 여러 개를 등록하여 관리할 수 있습니다.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 회원 관리 섹션 -->
+            <section id="members-section" class="admin-section p-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">회원 관리</h3>
+                    <p class="text-gray-600 mb-6">고객 계정을 관리하고 회원 상태를 조회할 수 있습니다.</p>
+                    
+                    <div class="mb-8 flex flex-wrap items-center justify-between">
+                        <div class="mb-4 md:mb-0">
+                            <div class="flex space-x-2">
+                                <div class="relative">
+                                    <select id="member-status-filter" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                        <option value="all">전체 회원</option>
+                                        <option value="active">활성 회원</option>
+                                        <option value="inactive">비활성 회원</option>
+                                    </select>
+                                </div>
+                                <div class="relative rounded-md shadow-sm">
+                                    <input type="text" id="member-search" class="focus:ring-blue-500 focus:border-blue-500 block w-full pr-10 sm:text-sm border-gray-300 rounded-md p-2" placeholder="이름 또는 이메일로 검색">
+                                    <div class="absolute inset-y-0 right-0 flex items-center px-3">
+                                        <i class="fas fa-search text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <button id="add-member-btn" class="inline-flex items-center justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-plus mr-2"></i> 회원 추가
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-300">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">회원 ID</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">이름</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">이메일</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">가입일</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">상태</th>
+                                    <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                        <span class="sr-only">작업</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white" id="member-list">
+                                <!-- 회원 목록이 동적으로 렌더링됩니다 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 페이지네이션 -->
+                    <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4">
+                        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm text-gray-700" id="member-count">
+                                    총 <span class="font-medium">0</span>명의 회원이 있습니다.
+                                </p>
+                            </div>
+                            <div>
+                                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination" id="member-pagination">
+                                    <!-- 페이지네이션 버튼들이 여기에 동적으로 추가됩니다 -->
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 회원 상세 정보 모달 -->
+                <div id="member-detail-modal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+                    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
+                        <!-- 배경 오버레이 -->
+                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" id="member-modal-backdrop"></div>
+                        
+                        <!-- 모달 내용 -->
+                        <div class="relative inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="member-modal-title">회원 상세 정보</h3>
+                                
+                                <div id="member-form" class="grid grid-cols-1 gap-4">
+                                    <div>
+                                        <label for="member-name" class="block text-sm font-medium text-gray-700">이름</label>
+                                        <input type="text" id="member-name" name="member-name" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
+                                    </div>
+                                    <div>
+                                        <label for="member-email" class="block text-sm font-medium text-gray-700">이메일</label>
+                                        <input type="email" id="member-email" name="member-email" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
+                                    </div>
+                                    <div>
+                                        <label for="member-phone" class="block text-sm font-medium text-gray-700">전화번호</label>
+                                        <input type="tel" id="member-phone" name="member-phone" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
+                                    </div>
+                                    <div>
+                                        <label for="member-status" class="block text-sm font-medium text-gray-700">계정 상태</label>
+                                        <select id="member-status" name="member-status" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                            <option value="active">활성</option>
+                                            <option value="inactive">비활성</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button type="button" id="save-member-btn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                    저장
+                                </button>
+                                <button type="button" id="close-member-modal-btn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                    닫기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Packages Section -->
+            <section id="packages-section" class="admin-section p-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">패키지 상품 관리</h3>
+                    <form id="package-form" class="space-y-4 mb-6">
+                        <input type="hidden" id="package-id">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="package-name" class="block text-sm font-medium text-gray-700">상품명</label>
+                                <input type="text" id="package-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                            </div>
+                            <div>
+                                <label for="package-category" class="block text-sm font-medium text-gray-700">카테고리</label>
+                                <select id="package-category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                                    <option value="">카테고리 선택</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="package-description" class="block text-sm font-medium text-gray-700">상품 설명</label>
+                            <textarea id="package-description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"></textarea>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label for="package-price" class="block text-sm font-medium text-gray-700">가격</label>
+                                <input type="number" id="package-price" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                            </div>
+                            <div>
+                                <label for="package-image" class="block text-sm font-medium text-gray-700">이미지 URL</label>
+                                <input type="text" id="package-image" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            </div>
+                             <div>
+                                <label for="package-stock" class="block text-sm font-medium text-gray-700">재고</label>
+                                <input type="number" id="package-stock" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                            </div>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">상품 저장</button>
+                            <button type="button" id="package-form-cancel" class="px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400 ml-2 hidden">취소</button>
+                        </div>
+                    </form>
+
+                    <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-300">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">상품명</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">카테고리</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">가격</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">재고</th>
+                                    <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                        <span class="sr-only">Actions</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white" id="package-list">
+                                <!-- 상품 목록이 동적으로 렌더링됩니다 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Footer Section -->
+            <section id="footer-section" class="admin-section p-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">푸터 정보 수정</h3>
+                    
+                    <form id="footer-form" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="footer-ceo" class="block text-sm font-medium text-gray-700">대표</label>
+                                <input type="text" id="footer-ceo" value="홍길동" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            </div>
+                            <div>
+                                <label for="footer-business-number" class="block text-sm font-medium text-gray-700">사업자등록번호</label>
+                                <input type="text" id="footer-business-number" value="123-45-67890" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            </div>
+                            <div>
+                                <label for="footer-report-number" class="block text-sm font-medium text-gray-700">통신판매업신고번호</label>
+                                <input type="text" id="footer-report-number" value="제2025-서울강남-1234호" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            </div>
+                            <div>
+                                <label for="footer-tourism-number" class="block text-sm font-medium text-gray-700">관광사업자등록번호</label>
+                                <input type="text" id="footer-tourism-number" value="제2025-01호" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="footer-address" class="block text-sm font-medium text-gray-700">주소</label>
+                                <input type="text" id="footer-address" value="서울특별시 강남구 테헤란로 123, 7층" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            </div>
+                            <div>
+                                <label for="footer-contact" class="block text-sm font-medium text-gray-700">고객센터</label>
+                                <input type="text" id="footer-contact" value="1588-1234" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            </div>
+                            <div>
+                                <label for="footer-contact-hours" class="block text-sm font-medium text-gray-700">고객센터 운영시간</label>
+                                <input type="text" id="footer-contact-hours" value="평일 09:00-18:00 (주말/공휴일 휴무)" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-5">
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                저장하기
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 예약 관리 섹션 -->
+            <section id="reservations-section" class="admin-section p-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">예약 관리</h3>
+                    
+                    <!-- 예약 관리 폼 -->
+                    <div class="mb-6">
+                        <form id="reservation-form" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="res-user" class="block text-sm font-medium text-gray-700">예약자 이름</label>
+                                    <input type="text" id="res-user" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="홍길동" required>
+                                </div>
+                                <div>
+                                    <label for="res-package" class="block text-sm font-medium text-gray-700">여행 패키지</label>
+                                    <input type="text" id="res-package" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="제주도 3일" required>
+                                </div>
+                                <div>
+                                    <label for="res-date" class="block text-sm font-medium text-gray-700">예약 날짜</label>
+                                    <input type="date" id="res-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                                </div>
+                                <div>
+                                    <label for="res-status" class="block text-sm font-medium text-gray-700">상태</label>
+                                    <select id="res-status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                                        <option value="pending">대기</option>
+                                        <option value="confirmed">확정</option>
+                                        <option value="canceled">취소</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">예약 등록</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- 예약 목록 테이블 -->
+                    <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-300">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="py-3.5 px-4 text-left text-sm font-semibold text-gray-900">예약자</th>
+                                    <th class="py-3.5 px-4 text-left text-sm font-semibold text-gray-900">패키지</th>
+                                    <th class="py-3.5 px-4 text-left text-sm font-semibold text-gray-900">날짜</th>
+                                    <th class="py-3.5 px-4 text-left text-sm font-semibold text-gray-900">상태</th>
+                                    <th class="relative py-3.5 pl-3 pr-4 sm:pr-6"><span class="sr-only">Actions</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="reservation-list" class="divide-y divide-gray-200 bg-white">
+                                <!-- JS로 예약 목록이 렌더링됩니다 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // =================================================================================
+        // 데이터 및 상태 관리
+        // =================================================================================
+
+        // 국가/지역 카테고리 데이터
+        let categories = [
+            { id: 1, name: '동남아', order: 1, subCategories: [
+                { id: 101, parentId: 1, name: '태국', order: 1 },
+                { id: 102, parentId: 1, name: '베트남', order: 2 },
+                { id: 103, parentId: 1, name: '필리핀', order: 3 }
+            ]},
+            { id: 2, name: '유럽', order: 2, subCategories: [
+                { id: 104, parentId: 2, name: '프랑스', order: 1 },
+                { id: 105, parentId: 2, name: '이탈리아', order: 2 }
+            ]},
+            { id: 3, name: '미주', order: 3, subCategories: [] }
+        ];
+        let editingCategoryId = null;
+        let editingSubCategoryId = null;
+
+        // 메뉴 카테고리 데이터는 admin.js에서 로드됩니다.
+        // window.menuCategories를 사용합니다.
+        let editingMenuCategoryId = null;
+
+        // 패키지 상품 데이터
+        let packages = [
+            { id: 1, name: '파리 5일 자유여행', categoryId: 2, description: '에펠탑과 루브르 박물관을 즐기는 자유로운 파리 여행', price: 1500000, imageUrl: 'images/paris.jpg', stock: 10 },
+            { id: 2, name: '방콕/파타야 6일 패키지', categoryId: 2, description: '휴양과 관광을 한번에 즐기는 태국 핵심 코스', price: 890000, imageUrl: 'images/bangkok.jpg', stock: 20 },
+            { id: 3, name: '로마/바티칸 4일 집중투어', categoryId: 2, description: '역사와 예술의 도시 로마 완전 정복', price: 1200000, imageUrl: 'images/rome.jpg', stock: 15 }
+        ];
+        let editingPackageId = null;
+
+        // 계좌 데이터
+        let bankAccounts = [
+            { id: 1, bankName: '신한은행', accountNumber: '110-123-456789', accountHolder: '트립스토어', active: true },
+            { id: 2, bankName: '국민은행', accountNumber: '220-456-789123', accountHolder: '트립스토어', active: false }
+        ];
+
+        // 회원 데이터
+        let members = [
+            { id: 1, name: '김철수', email: 'kim@example.com', phone: '010-1234-5678', joinDate: '2023-01-15', status: 'active' },
+            { id: 2, name: '이영희', email: 'lee@example.com', phone: '010-2345-6789', joinDate: '2023-02-20', status: 'active' },
+            { id: 3, name: '박지민', email: 'park@example.com', phone: '010-3456-7890', joinDate: '2023-03-10', status: 'inactive' },
+            { id: 4, name: '최영수', email: 'choi@example.com', phone: '010-4567-8901', joinDate: '2023-04-05', status: 'active' },
+            { id: 5, name: '정민지', email: 'jung@example.com', phone: '010-5678-9012', joinDate: '2023-05-22', status: 'inactive' }
+        ];
+        let filteredMembers = [...members];
+        const MEMBERS_PER_PAGE = 10;
+        let currentPage = 1;
+
+        // 예약 데이터
+        let reservations = [
+            { id: 1001, name: '홍길동', phone: '010-1111-2222', packageName: '파리 5일 자유여행', date: '2025-06-25', status: '확정' },
+            { id: 1002, name: '김영희', phone: '010-3333-4444', packageName: '방콕/파타야 6일 패키지', date: '2025-06-24', status: '대기' },
+            { id: 1003, name: '이철수', phone: '010-5555-6666', packageName: '로마/바티칸 4일 집중투어', date: '2025-06-23', status: '취소' }
+        ];
+        let filteredReservations = [...reservations];
+
+        // =================================================================================
+        // 렌더링 함수
+        // =================================================================================
+
+        // 국가 목록 렌더링
+        function renderCategories() {
+            const categoryList = document.getElementById('category-list');
+            categoryList.innerHTML = '';
+            const sortedCategories = [...categories].sort((a, b) => a.order - b.order);
+
+            if (sortedCategories.length === 0) {
+                categoryList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">등록된 국가가 없습니다.</td></tr>';
+                return;
+            }
+
+            sortedCategories.forEach(category => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">${category.order}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${category.name}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${category.subCategories?.length || 0}</td>
+                    <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
+                        <button onclick="editCategory(${category.id})" class="text-blue-600 hover:text-blue-900 mr-2">수정</button>
+                        <button onclick="deleteCategory(${category.id})" class="text-red-600 hover:text-red-900">삭제</button>
+                    </td>
+                `;
+                categoryList.appendChild(row);
+            });
+            updateParentCategoryDropdown();
+        }
+
+        // 지역/도시 목록 렌더링
+        function renderSubCategories(parentId) {
+            const subCategoryList = document.getElementById('sub-category-list');
+            subCategoryList.innerHTML = '';
+            const parentCategory = categories.find(cat => cat.id === parentId);
+            const subCategories = parentCategory?.subCategories?.sort((a, b) => a.order - b.order) || [];
+
+            if (subCategories.length === 0) {
+                subCategoryList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">등록된 지역/도시가 없습니다.</td></tr>';
+                return;
+            }
+
+            subCategories.forEach(sub => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">${sub.order}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${parentCategory.name}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${sub.name}</td>
+                    <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
+                        <button onclick="editSubCategory(${sub.id}, ${parentId})" class="text-blue-600 hover:text-blue-900 mr-2">수정</button>
+                        <button onclick="deleteSubCategory(${sub.id}, ${parentId})" class="text-red-600 hover:text-red-900">삭제</button>
+                    </td>
+                `;
+                subCategoryList.appendChild(row);
+            });
+        }
+
+        // 메뉴 카테고리 렌더링
+        function renderMenuCategories() {
+            const menuCategoryList = document.getElementById('menu-category-list');
+            menuCategoryList.innerHTML = '';
+            const sortedMenuCategories = [...menuCategories].sort((a, b) => a.order - b.order);
+
+            if (sortedMenuCategories.length === 0) {
+                menuCategoryList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">등록된 메뉴가 없습니다.</td></tr>';
+                return;
+            }
+
+            sortedMenuCategories.forEach(category => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">${category.order}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${category.name}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${category.url}</td>
+                    <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
+                        <button onclick="editMenuCategory(${category.id})" class="text-blue-600 hover:text-blue-900 mr-2">수정</button>
+                        <button onclick="deleteMenuCategory(${category.id})" class="text-red-600 hover:text-red-900">삭제</button>
+                    </td>
+                `;
+                menuCategoryList.appendChild(row);
+            });
+        }
+
+        // 패키지 상품 목록 렌더링
+        function renderPackages() {
+            const packageList = document.getElementById('package-list');
+            packageList.innerHTML = '';
+
+            if (packages.length === 0) {
+                packageList.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">등록된 상품이 없습니다.</td></tr>';
+                return;
+            }
+
+            packages.forEach(pkg => {
+                const category = menuCategories.find(cat => cat.id === pkg.categoryId);
+                const categoryName = category ? category.name : '미분류';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">${pkg.name}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${categoryName}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${pkg.price.toLocaleString()}원</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${pkg.stock}</td>
+                    <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
+                        <button onclick="editPackage(${pkg.id})" class="text-blue-600 hover:text-blue-900 mr-2">수정</button>
+                        <button onclick="deletePackage(${pkg.id})" class="text-red-600 hover:text-red-900">삭제</button>
+                    </td>
+                `;
+                packageList.appendChild(row);
+            });
+        }
+
+        // 계좌 목록 렌더링
+        function renderAccounts() {
+            const accountList = document.getElementById('account-list');
+            accountList.innerHTML = '';
+
+            if (bankAccounts.length === 0) {
+                accountList.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">등록된 계좌가 없습니다.</td></tr>';
+                return;
+            }
+
+            bankAccounts.forEach(account => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">${account.bankName}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${account.accountNumber}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${account.accountHolder}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${account.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                            ${account.active ? '사용 중' : '사용 안함'}
+                        </span>
+                    </td>
+                    <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
+                        <button onclick="editAccount(${account.id})" class="text-blue-600 hover:text-blue-900 mr-2">수정</button>
+                        <button onclick="toggleAccountStatus(${account.id})" class="${account.active ? 'text-orange-600 hover:text-orange-900' : 'text-green-600 hover:text-green-900'} mr-2">
+                            ${account.active ? '비활성화' : '활성화'}
+                        </button>
+                        <button onclick="deleteAccount(${account.id})" class="text-red-600 hover:text-red-900">삭제</button>
+                    </td>
+                `;
+                accountList.appendChild(row);
+            });
+        }
+
+        // 회원 목록 렌더링
+        function renderMembers() {
+            const memberList = document.getElementById('member-list');
+            memberList.innerHTML = '';
+            const startIndex = (currentPage - 1) * MEMBERS_PER_PAGE;
+            const endIndex = startIndex + MEMBERS_PER_PAGE;
+            const membersToShow = filteredMembers.slice(startIndex, endIndex);
+
+            if (membersToShow.length === 0) {
+                memberList.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">조건에 맞는 회원이 없습니다.</td></tr>';
+            } else {
+                membersToShow.forEach(member => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">${member.id}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${member.name}</td>
+            });4 text-sm text-gray-500">${member.email}</td>
+        }itespace-nowrap px-3 py-4 text-sm text-gray-500">${member.joinDate}</td>
+
+        // 패키지 상품 목록 렌더링member.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+        function renderPackages() {
+            const packageList = document.getElementById('package-list');
+            packageList.innerHTML = '';
+
+            if (packages.length === 0) {id})" class="text-blue-600 hover:text-blue-900 mr-2">상세정보</button>
+                packageList.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">등록된 상품이 없습니다.</td></tr>'; onclick="toggleMemberStatus(${member.id})" class="${member.status === 'active' ? 'text-orange-600 hover:text-orange-900' : 'text-green-600 hover:text-green-900'} mr-2">
+                return;   ${member.status === 'active' ? '비활성화' : '활성화'}
+            }
+
+            packages.forEach(pkg => {
+                const category = menuCategories.find(cat => cat.id === pkg.categoryId);
+                const categoryName = category ? category.name : '미분류';Child(row);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `uerySelector('#member-count span').textContent = filteredMembers.length;
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">${pkg.name}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${categoryName}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${pkg.price.toLocaleString()}원</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${pkg.stock}</td>
+                    <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">on() {
+                        <button onclick="editPackage(${pkg.id})" class="text-blue-600 hover:text-blue-900 mr-2">수정</button>   const pagination = document.getElementById('member-pagination');
+                        <button onclick="deletePackage(${pkg.id})" class="text-red-600 hover:text-red-900">삭제</button>            const totalPages = Math.ceil(filteredMembers.length / MEMBERS_PER_PAGE);
+                    </td>n.innerHTML = '';
+                `;rn;
+                packageList.appendChild(row);
+            });
+        }
+tive inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50';
+        // 계좌 목록 렌더링            prevButton.innerHTML = '<span class="sr-only">이전</span><i class="fas fa-chevron-left"></i>';
+        function renderAccounts() {); if (currentPage > 1) { currentPage--; renderMembers(); } };
+            const accountList = document.getElementById('account-list');(prevButton);
+            accountList.innerHTML = '';
+
+            if (bankAccounts.length === 0) {
+                accountList.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">등록된 계좌가 없습니다.</td></tr>';
+                return;                pageButton.className = `relative inline-flex items-center px-4 py-2 border text-sm font-medium ${i === currentPage ? 'bg-blue-50 border-blue-500 text-blue-600 z-10' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`;
+            }
+); currentPage = i; renderMembers(); };
+            bankAccounts.forEach(account => {(pageButton);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">${account.bankName}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${account.accountNumber}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${account.accountHolder}</td>extButton.className = 'relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50';
+                    <td class="whitespace-nowrap px-3 py-4 text-sm">            nextButton.innerHTML = '<span class="sr-only">다음</span><i class="fas fa-chevron-right"></i>';
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${account.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">); if (currentPage < totalPages) { currentPage++; renderMembers(); } };
+                            ${account.active ? '사용 중' : '사용 안함'}(nextButton);
+                        </span>
+                    </td>
+                    <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
+                        <button onclick="editAccount(${account.id})" class="text-blue-600 hover:text-blue-900 mr-2">수정</button>
+                        <button onclick="toggleAccountStatus(${account.id})" class="${account.active ? 'text-orange-600 hover:text-orange-900' : 'text-green-600 hover:text-green-900'} mr-2">   const reservationList = document.getElementById('reservation-list');
+                            ${account.active ? '비활성화' : '활성화'}            reservationList.innerHTML = '';
+                        </button>eredReservations.length === 0) {
+                        <button onclick="deleteAccount(${account.id})" class="text-red-600 hover:text-red-900">삭제</button>ML = '<tr><td colspan="7" class="text-center py-4 text-gray-500">예약 내역이 없습니다.</td></tr>';
+                    </td>
+                `;
+                accountList.appendChild(row);
+            });
+        }erHTML = `
+       <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">${resv.id}</td>
+        // 회원 목록 렌더링x-3 py-4 text-sm text-gray-500">${resv.name}</td>
+        function renderMembers() {4 text-sm text-gray-500">${resv.phone}</td>
+            const memberList = document.getElementById('member-list');itespace-nowrap px-3 py-4 text-sm text-gray-500">${resv.packageName}</td>
+            memberList.innerHTML = '';
+            const startIndex = (currentPage - 1) * MEMBERS_PER_PAGE;d>
+            const endIndex = startIndex + MEMBERS_PER_PAGE;
+            const membersToShow = filteredMembers.slice(startIndex, endIndex);-900">삭제</button>
+
+            if (membersToShow.length === 0) {
+                memberList.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">조건에 맞는 회원이 없습니다.</td></tr>';
+            } else {
+                membersToShow.forEach(member => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `===========================================
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">${member.id}</td> 및 핸들러 함수
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${member.name}</td>/ =================================================================================
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${member.email}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${member.joinDate}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm">egory(id) {
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${member.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                ${member.status === 'active' ? '활성' : '비활성'}            if (category) {
+                            </span>ategoryId = id;
+                        </td>ById('category-name').value = category.name;
+                        <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">ategory.order;
+                            <button onclick="openMemberDetailModal(${member.id})" class="text-blue-600 hover:text-blue-900 mr-2">상세정보</button>erySelector('#category-form button[type="submit"]').textContent = '수정';
+                            <button onclick="toggleMemberStatus(${member.id})" class="${member.status === 'active' ? 'text-orange-600 hover:text-orange-900' : 'text-green-600 hover:text-green-900'} mr-2">
+                                ${member.status === 'active' ? '비활성화' : '활성화'}
+                            </button>
+                            <button onclick="deleteMember(${member.id})" class="text-red-600 hover:text-red-900">삭제</button>
+                        </td>onst category = categories.find(cat => cat.id === id);
+                    `;   if (category) {
+                    memberList.appendChild(row);                if (category.subCategories && category.subCategories.length > 0) {
+                });는 국가는 삭제할 수 없습니다. 지역/도시를 먼저 삭제해주세요.');
+            }
+            document.querySelector('#member-count span').textContent = filteredMembers.length;
+            renderPagination();
+        }
+ategories();
+        // 페이지네이션 렌더링
+        function renderPagination() {
+            const pagination = document.getElementById('member-pagination');
+            const totalPages = Math.ceil(filteredMembers.length / MEMBERS_PER_PAGE);
+            pagination.innerHTML = '';/도시 관리 ---
+            if (totalPages <= 1) return;ion editSubCategory(subId, parentId) {
+   const parentCategory = categories.find(cat => cat.id === parentId);
+            const prevButton = document.createElement('a');            if (parentCategory) {
+            prevButton.href = '#';tegory = parentCategory.subCategories.find(sub => sub.id === subId);
+            prevButton.className = 'relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50';
+            prevButton.innerHTML = '<span class="sr-only">이전</span><i class="fas fa-chevron-left"></i>';
+            prevButton.onclick = (e) => { e.preventDefault(); if (currentPage > 1) { currentPage--; renderMembers(); } };lementById('parent-category').value = parentId;
+            pagination.appendChild(prevButton);
+ementById('sub-category-order').value = subCategory.order;
+            for (let i = 1; i <= totalPages; i++) {category-form button[type="submit"]').textContent = '수정';
+                const pageButton = document.createElement('a');
+                pageButton.href = '#';
+                pageButton.className = `relative inline-flex items-center px-4 py-2 border text-sm font-medium ${i === currentPage ? 'bg-blue-50 border-blue-500 text-blue-600 z-10' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`;
+                pageButton.textContent = i;
+                pageButton.onclick = (e) => { e.preventDefault(); currentPage = i; renderMembers(); };
+                pagination.appendChild(pageButton);deleteSubCategory(subId, parentId) {
+            }onst parentCategory = categories.find(cat => cat.id === parentId);
+   if (parentCategory) {
+            const nextButton = document.createElement('a');                const subCategoryName = parentCategory.subCategories.find(sub => sub.id === subId)?.name;
+            nextButton.href = '#';도시를 삭제하시겠습니까?`)) {
+            nextButton.className = 'relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50';.filter(sub => sub.id !== subId);
+            nextButton.innerHTML = '<span class="sr-only">다음</span><i class="fas fa-chevron-right"></i>';gories(parentId);
+            nextButton.onclick = (e) => { e.preventDefault(); if (currentPage < totalPages) { currentPage++; renderMembers(); } };
+            pagination.appendChild(nextButton);
+        }
+
+        // 예약 목록 렌더링
+        function renderReservations() { 카테고리 관리 ---
+            const reservationList = document.getElementById('reservation-list');ion editMenuCategory(id) {
+            reservationList.innerHTML = '';   const category = menuCategories.find(cat => cat.id === id);
+            if (filteredReservations.length === 0) {            if (category) {
+                reservationList.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500">예약 내역이 없습니다.</td></tr>';tegoryId = id;
+                return;('menu-category-name').value = category.name;
+            }tegory.url;
+            filteredReservations.forEach(resv => {tElementById('menu-category-order').value = category.order;
+                const row = document.createElement('tr');nu-category-form button[type="submit"]').textContent = '수정';
+                row.innerHTML = `
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">${resv.id}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${resv.name}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${resv.phone}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${resv.packageName}</td>onst category = menuCategories.find(cat => cat.id === id);
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${resv.date}</td>   if (category && confirm(`'${category.name}' 메뉴를 삭제하시겠습니까?`)) {
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${resv.status}</td>                menuCategories = menuCategories.filter(cat => cat.id !== id);
+                    <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
+                        <button onclick="deleteReservation(${resv.id})" class="text-red-600 hover:text-red-900">삭제</button>
+                    </td>
+                `;
+                reservationList.appendChild(row);
+            });ion editPackage(id) {
+        }   const pkg = packages.find(p => p.id === id);
+            if (pkg) {
+        // =================================================================================geId = id;
+        // CRUD 및 핸들러 함수tById('package-id').value = pkg.id;
+        // =================================================================================value = pkg.name;
+nt.getElementById('package-category').value = pkg.categoryId;
+        // --- 국가 관리 ---d('package-description').value = pkg.description;
+        function editCategory(id) {price;
+            const category = categories.find(cat => cat.id === id);eUrl;
+            if (category) {
+                editingCategoryId = id;nt = '상품 수정';
+                document.getElementById('category-name').value = category.name;move('hidden');
+                document.getElementById('category-order').value = category.order;
+                document.querySelector('#category-form button[type="submit"]').textContent = '수정';
+            }
+        }
+onst pkg = packages.find(p => p.id === id);
+        function deleteCategory(id) {   if (pkg && confirm(`'${pkg.name}' 상품을 삭제하시겠습니까?`)) {
+            const category = categories.find(cat => cat.id === id);                packages = packages.filter(p => p.id !== id);
+            if (category) {
+                if (category.subCategories && category.subCategories.length > 0) {
+                    alert('하위 카테고리가 있는 국가는 삭제할 수 없습니다. 지역/도시를 먼저 삭제해주세요.');
+                    return;
+                }
+                if (confirm(`'${category.name}' 국가를 삭제하시겠습니까?`)) {ion editAccount(id) {
+                    categories = categories.filter(cat => cat.id !== id);   const account = bankAccounts.find(acc => acc.id === id);
+                    renderCategories();            if (account) {
+                }.getElementById('account-form').dataset.id = id;
+            }tById('bank-name').value = account.bankName;
+        }count.accountNumber;
+etElementById('account-holder').value = account.accountHolder;
+        // --- 지역/도시 관리 ---t"]').textContent = '계좌 수정';
+        function editSubCategory(subId, parentId) {
+            const parentCategory = categories.find(cat => cat.id === parentId);
+            if (parentCategory) {
+                const subCategory = parentCategory.subCategories.find(sub => sub.id === subId);
+                if (subCategory) {onst account = bankAccounts.find(acc => acc.id === id);
+                    editingSubCategoryId = subId;   if (account) {
+                    document.getElementById('parent-category').value = parentId;                account.active = !account.active;
+                    document.getElementById('sub-category-name').value = subCategory.name;
+                    document.getElementById('sub-category-order').value = subCategory.order;
+                    document.querySelector('#sub-category-form button[type="submit"]').textContent = '수정';
+                    switchToSubCategoryMode();
+                }) {
+            }f (confirm('이 계좌를 삭제하시겠습니까?')) {
+        }       bankAccounts = bankAccounts.filter(acc => acc.id !== id);
+                renderAccounts();
+        function deleteSubCategory(subId, parentId) {
+            const parentCategory = categories.find(cat => cat.id === parentId);
+            if (parentCategory) {
+                const subCategoryName = parentCategory.subCategories.find(sub => sub.id === subId)?.name;
+                if (confirm(`'${subCategoryName}' 지역/도시를 삭제하시겠습니까?`)) {ion filterMembers() {
+                    parentCategory.subCategories = parentCategory.subCategories.filter(sub => sub.id !== subId);   const searchTerm = document.getElementById('member-search').value.toLowerCase();
+                    renderSubCategories(parentId);            const statusFilter = document.getElementById('member-status-filter').value;
+                    renderCategories(); // 국가의 지역/도시 수 업데이트ers = members.filter(member => {
+                }h = member.name.toLowerCase().includes(searchTerm) || member.email.toLowerCase().includes(searchTerm);
+            }er;
+        }
+
+        // --- 메뉴 카테고리 관리 ---
+        function editMenuCategory(id) {
+            const category = menuCategories.find(cat => cat.id === id);
+            if (category) {
+                editingMenuCategoryId = id;rStatus(id) {
+                document.getElementById('menu-category-name').value = category.name;embers.find(m => m.id === id);
+                document.getElementById('menu-category-url').value = category.url;   if (member) {
+                document.getElementById('menu-category-order').value = category.order;                const newStatus = member.status === 'active' ? 'inactive' : 'active';
+                document.querySelector('#menu-category-form button[type="submit"]').textContent = '수정';me}' 회원의 상태를 ${newStatus === 'active' ? '활성' : '비활성'}으로 변경하시겠습니까?`)) {
+            }
+        }rMembers();
+
+        function deleteMenuCategory(id) {
+            const category = menuCategories.find(cat => cat.id === id);
+            if (category && confirm(`'${category.name}' 메뉴를 삭제하시겠습니까?`)) {
+                menuCategories = menuCategories.filter(cat => cat.id !== id);deleteMember(id) {
+                renderMenuCategories();onst member = members.find(m => m.id === id);
+            }   if (member && confirm(`'${member.name}' 회원을 삭제하시겠습니까?`)) {
+        }                members = members.filter(m => m.id !== id);
+
+        // --- 패키지 상품 관리 ---
+        function editPackage(id) {
+            const pkg = packages.find(p => p.id === id);
+            if (pkg) {lModal(id) {
+                editingPackageId = id;onst modal = document.getElementById('member-detail-modal');
+                document.getElementById('package-id').value = pkg.id;   const title = document.getElementById('member-modal-title');
+                document.getElementById('package-name').value = pkg.name;            const form = document.getElementById('member-form');
+                document.getElementById('package-category').value = pkg.categoryId;
+                document.getElementById('package-description').value = pkg.description;
+                document.getElementById('package-price').value = pkg.price;
+                document.getElementById('package-image').value = pkg.imageUrl;
+                    title.textContent = '회원 상세 정보';
+                    document.getElementById('member-name').value = member.name;
+                    document.getElementById('member-email').value = member.email;
+                    document.getElementById('member-phone').value = member.phone;
+                    document.getElementById('member-status').value = member.status;
+                    form.dataset.id = id;
+                }
+            } else {
+                title.textContent = '새 회원 추가';
+                delete form.dataset.id;
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeMemberModal() {
+            document.getElementById('member-detail-modal').classList.add('hidden');
+        }
+
+        function saveMember() {
+            const form = document.getElementById('member-form');
+            const id = form.dataset.id ? parseInt(form.dataset.id) : null;
+            const name = document.getElementById('member-name').value;
+            const email = document.getElementById('member-email').value;
+            const phone = document.getElementById('member-phone').value;
+            const status = document.getElementById('member-status').value;
+
+            if (!name || !email) {
+                alert('이름과 이메일은 필수입니다.');
+                return;
+            }
+
+            if (id) {
+                const member = members.find(m => m.id === id);
+                if (member) {
+                    member.name = name;
+                    member.email = email;
+                    member.phone = phone;
+                    member.status = status;
+                }
+            } else {
+                const newId = members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1;
+                const joinDate = new Date().toISOString().split('T')[0];
+                members.push({ id: newId, name, email, phone, joinDate, status });
+            }
+            closeMemberModal();
+            filterMembers();
+        }
+
+        // 예약 관리
+        function deleteReservation(id) {
+            if (confirm('이 예약을 삭제하시겠습니까?')) {
+                reservations = reservations.filter(r => r.id !== id);
+                filteredReservations = reservations;
+                renderReservations();
+            }
+        }
+
+        function filterReservations() {
+            const search = document.getElementById('reservation-search').value.toLowerCase();
+            filteredReservations = reservations.filter(r =>
+                r.name.toLowerCase().includes(search) ||
+                r.phone.includes(search) ||
+                r.packageName.toLowerCase().includes(search)
+            );
+            renderReservations();
+        }
+
+        // =================================================================================
+        // 유틸리티 함수
+        // =================================================================================
+
+        function switchToMainCategoryMode() {
+            document.getElementById('country-management').classList.remove('hidden');
+            document.getElementById('city-management').classList.add('hidden');
+            document.getElementById('country-tab-btn').classList.add('border-blue-600', 'text-blue-600');
+            document.getElementById('country-tab-btn').classList.remove('border-transparent', 'text-gray-500');
+            document.getElementById('city-tab-btn').classList.add('border-transparent', 'text-gray-500');
+            document.getElementById('city-tab-btn').classList.remove('border-blue-600', 'text-blue-600');
+        }
+
+        function switchToSubCategoryMode() {
+            document.getElementById('country-management').classList.add('hidden');
+            document.getElementById('city-management').classList.remove('hidden');
+            document.getElementById('city-tab-btn').classList.add('border-blue-600', 'text-blue-600');
+            document.getElementById('city-tab-btn').classList.remove('border-transparent', 'text-gray-500');
+            document.getElementById('country-tab-btn').classList.add('border-transparent', 'text-gray-500');
+            document.getElementById('country-tab-btn').classList.remove('border-blue-600', 'text-blue-600');
+            if (categories.length > 0 && !document.getElementById('parent-category').value) {
+                 document.getElementById('parent-category').value = categories[0].id;
+            }
+            renderSubCategories(parseInt(document.getElementById('parent-category').value) || (categories[0]?.id));
+        }
+        
+        function updateParentCategoryDropdown() {
+            const parentCategorySelect = document.getElementById('parent-category');
+            const currentVal = parentCategorySelect.value;
+            parentCategorySelect.innerHTML = '<option value="">국가 선택</option>';
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.textContent = category.name;
+                parentCategorySelect.appendChild(option);
+            });
+            parentCategorySelect.value = currentVal;
+        }
+
+        function updatePackageCategoryDropdown() {
+            const packageCategorySelect = document.getElementById('package-category');
+            const currentVal = packageCategorySelect.value;
+            packageCategorySelect.innerHTML = '<option value="">카테고리 선택</option>';
+            menuCategories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.textContent = category.name;
+                packageCategorySelect.appendChild(option);
+            });
+            packageCategorySelect.value = currentVal;
+        }
+
+        // =================================================================================
+        // 초기화 및 이벤트 리스너
+        // =================================================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 초기 렌더링 ---
+            renderMenuCategories();
+            renderCategories();
+            renderAccounts();
+            renderMembers();
+            renderPackages();
+            updatePackageCategoryDropdown();
+            renderReservations();
+            document.getElementById('reservation-search').addEventListener('input', filterReservations);
+
+            // --- 내비게이션 ---
+            const navLinks = document.querySelectorAll('.nav-link[data-section]');
+            const sections = document.querySelectorAll('.admin-section');
+            const pageTitle = document.getElementById('page-title');
+
+            function showSection(sectionId, linkElement) {
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                });
+
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+                if (linkElement) {
+                    linkElement.classList.add('active');
+                    pageTitle.textContent = linkElement.querySelector('span').textContent;
+                }
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const sectionId = link.dataset.section;
+                    showSection(sectionId, link);
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('.sidebar .nav-link[data-section]');
+                if (link) {
+                    e.preventDefault();
+                    const sectionId = link.dataset.section;
+                    showSection(sectionId, link);
+                }
+            });
+
+            // --- 카테고리 관리 탭 전환 ---
+            const menuCatBtn = document.getElementById('menu-cat-btn');
+            const countryCatBtn = document.getElementById('country-cat-btn');
+            const menuCategorySection = document.getElementById('menu-category-section');
+            const countryCategorySection = document.getElementById('country-category-section');
+
+            menuCatBtn.addEventListener('click', () => {
+                menuCategorySection.classList.remove('hidden');
+                countryCategorySection.classList.add('hidden');
+                menuCatBtn.classList.add('border-blue-600', 'text-blue-600');
+                menuCatBtn.classList.remove('border-transparent', 'text-gray-500');
+                countryCatBtn.classList.add('border-transparent', 'text-gray-500');
+                countryCatBtn.classList.remove('border-blue-600', 'text-blue-600');
+            });
+
+            countryCatBtn.addEventListener('click', () => {
+                menuCategorySection.classList.add('hidden');
+                countryCategorySection.classList.remove('hidden');
+                countryCatBtn.classList.add('border-blue-600', 'text-blue-600');
+                countryCatBtn.classList.remove('border-transparent', 'text-gray-500');
+                menuCatBtn.classList.add('border-transparent', 'text-gray-500');
+                menuCatBtn.classList.remove('border-blue-600', 'text-blue-600');
+            });
+
+            // --- 국가/지역 관리 서브 탭 전환 ---
+            const countryTabBtn = document.getElementById('country-tab-btn');
+            const cityTabBtn = document.getElementById('city-tab-btn');
+
+            countryTabBtn.addEventListener('click', switchToMainCategoryMode);
+            cityTabBtn.addEventListener('click', switchToSubCategoryMode);
+
+            // --- 폼 제출 핸들러 ---
+
+            // 메뉴 카테고리 폼
+            document.getElementById('menu-category-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('menu-category-name').value;
+                const url = document.getElementById('menu-category-url').value;
+                const order = parseInt(document.getElementById('menu-category-order').value);
+
+                if (editingMenuCategoryId) {
+                    const category = menuCategories.find(cat => cat.id === editingMenuCategoryId);
+                    if (category) {
+                        category.name = name;
+                        category.url = url;
+                        category.order = order;
+                    }
+                } else {
+                    const newId = menuCategories.length > 0 ? Math.max(...menuCategories.map(c => c.id)) + 1 : 1;
+                    menuCategories.push({ id: newId, name, url, order });
+                }
+                editingMenuCategoryId = null;
+                document.getElementById('menu-category-form').reset();
+                document.querySelector('#menu-category-form button[type="submit"]').textContent = '저장';
+                renderMenuCategories();
+            });
+
+            // 국가 카테고리 폼
+            document.getElementById('category-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('category-name').value;
+                const order = parseInt(document.getElementById('category-order').value);
+
+                if (editingCategoryId) {
+                    const category = categories.find(cat => cat.id === editingCategoryId);
+                    if (category) {
+                        category.name = name;
+                        category.order = order;
+                    }
+                } else {
+                    const newId = categories.length > 0 ? Math.max(...categories.map(c => c.id)) + 1 : 1;
+                    categories.push({ id: newId, name, order, subCategories: [] });
+                }
+                editingCategoryId = null;
+                document.getElementById('category-form').reset();
+                document.querySelector('#category-form button[type="submit"]').textContent = '저장';
+                renderCategories();
+            });
+
+            // 서브 카테고리(지역/도시) 폼
+            document.getElementById('sub-category-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const parentId = parseInt(document.getElementById('parent-category').value);
+                const name = document.getElementById('sub-category-name').value;
+                const order = parseInt(document.getElementById('sub-category-order').value);
+                const parentCategory = categories.find(cat => cat.id === parentId);
+
+                if (!parentCategory) {
+                    alert('국가를 먼저 선택해주세요.');
+                    return;
+                }
+
+                if (editingSubCategoryId) {
+                    const subCategory = parentCategory.subCategories.find(sub => sub.id === editingSubCategoryId);
+                    if (subCategory) {
+                        subCategory.name = name;
+                        subCategory.order = order;
+                        // 만약 국가가 변경되었다면, 기존 국가에서 삭제하고 새 국가에 추가해야 함 (여기서는 단순화)
+                    }
+                } else {
+                    const newId = Date.now(); // 간단한 고유 ID 생성
+                    parentCategory.subCategories.push({ id: newId, parentId, name, order });
+                }
+
+                editingSubCategoryId = null;
+                document.getElementById('sub-category-form').reset();
+                document.querySelector('#sub-category-form button[type="submit"]').textContent = '추가';
+                document.getElementById('parent-category').value = parentId; // 국가 선택 유지
+                renderSubCategories(parentId);
+                renderCategories(); // 국가의 지역/도시 수 업데이트
+            });
+            
+            // 국가 선택 시 해당 지역/도시 목록 렌더링
+            document.getElementById('parent-category').addEventListener('change', (e) => {
+                const parentId = parseInt(e.target.value);
+                if (parentId) {
+                    renderSubCategories(parentId);
+                } else {
+                    document.getElementById('sub-category-list').innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">국가를 선택해주세요.</td></tr>';
+                }
+            });
+
+            // 패키지 상품 관리 폼
+            document.getElementById('package-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = editingPackageId;
+                const name = document.getElementById('package-name').value;
+                const categoryId = parseInt(document.getElementById('package-category').value);
+                const description = document.getElementById('package-description').value;
+                const price = parseInt(document.getElementById('package-price').value);
+                const imageUrl = document.getElementById('package-image').value;
+                const stock = parseInt(document.getElementById('package-stock').value);
+
+                if (!name || !categoryId || !price || !stock) {
+                    alert('필수 항목을 모두 입력해주세요.');
+                    return;
+                }
+
+                if (id) { // 수정
+                    const pkgIndex = packages.findIndex(p => p.id === id);
+                    if (pkgIndex > -1) {
+                        packages[pkgIndex] = { id, name, categoryId, description, price, imageUrl, stock };
+                    }
+                } else { // 추가
+                    const newId = packages.length > 0 ? Math.max(...packages.map(p => p.id)) + 1 : 1;
+                    packages.push({ id: newId, name, categoryId, description, price, imageUrl, stock });
+                }
+                renderPackages();
+                resetPackageForm();
+            });
+
+            document.getElementById('package-form-cancel').addEventListener('click', resetPackageForm);
+
+            // --- 로그아웃 ---
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                if (confirm('로그아웃 하시겠습니까?')) {
+                    // 실제 로그아웃 로직 구현 (예: 세션 제거, 로그인 페이지로 리디렉션)
+                    alert('로그아웃 되었습니다.');
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
+
+    <!-- 기본 내비게이션 스크립트 -->
+    <script>
+function showSection(id) {
+    document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
+    document.querySelectorAll('.nav-link[data-section]').forEach(l => l.classList.remove('active'));
+    const link = document.querySelector('.nav-link[data-section="' + id + '"]');
+    if (link) {
+        link.classList.add('active');
+        const txt = link.querySelector('span')?.textContent.trim();
+        if (txt) document.getElementById('page-title').textContent = txt;
+    }
+}
+// 이벤트 핸들러 등록
+document.querySelectorAll('.nav-link[data-section]').forEach(link => {
+    link.addEventListener('click', e => {
+        e.preventDefault();
+        showSection(link.getAttribute('data-section'));
+    });
+});
+// 초기 표시
+showSection(window.location.hash.substring(1) || 'dashboard-section');
+</script>
+
+<!-- 예약 관리 스크립트 -->
+<script>
+  (function() {
+    const form = document.getElementById('reservation-form');
+    const listEl = document.getElementById('reservation-list');
+    let reservations = [];
+    let editIndex = null; // 현재 수정 중인 인덱스
+
+    function renderReservations() {
+      listEl.innerHTML = '';
+      reservations.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-2 px-4 text-sm text-gray-700">${r.user}</td>
+          <td class="py-2 px-4 text-sm text-gray-700">${r.package}</td>
+          <td class="py-2 px-4 text-sm text-gray-700">${r.date}</td>
+          <td class="py-2 px-4 text-sm text-gray-700">${r.status}</td>
+          <td class="py-2 px-4 text-right text-sm font-medium space-x-2">
+            <button data-index="${idx}" class="text-green-600 hover:text-green-900 edit-btn">수정</button>
+            <button data-index="${idx}" class="text-indigo-600 hover:text-indigo-900 delete-btn">삭제</button>
+          </td>
+        `;
+        listEl.appendChild(tr);
+      });
+      // 수정 버튼 이벤트
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-index'));
+        const r = reservations[idx];
+        document.getElementById('res-user').value = r.user;
+        document.getElementById('res-package').value = r.package;
+        document.getElementById('res-date').value = r.date;
+        document.getElementById('res-status').value = r.status;
+        editIndex = idx;
+        form.querySelector('button[type="submit"]').textContent = '수정';
+      });
+    });
+      // 삭제 버튼 이벤트
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          reservations.splice(parseInt(btn.getAttribute('data-index')), 1);
+          renderReservations();
+        });
+      });
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const user = document.getElementById('res-user').value.trim();
+      const pkg = document.getElementById('res-package').value.trim();
+      const date = document.getElementById('res-date').value;
+      const status = document.getElementById('res-status').value;
+     if (editIndex !== null) {
+       // 수정 모드
+       reservations[editIndex] = { user, package: pkg, date, status };
+       editIndex = null;
+       form.querySelector('button[type="submit"]').textContent = '예약 등록';
+     } else {
+        if (user && pkg && date) {
+          reservations.push({ user, package: pkg, date, status });
+        }
+     }
+      renderReservations();
+      form.reset();
+    });
+
+    // 초기 렌더링
+    renderReservations();
+  })();
+</script>
+
+<!-- 메뉴 카테고리 관리 스크립트 -->
+<script>
+  (function() {
+    const form = document.getElementById('menu-category-form');
+    const listEl = document.getElementById('menu-category-list');
+    let categories = [];
+    let editIndex = null;
+
+    function renderCategories() {
+      listEl.innerHTML = '';
+      categories.forEach((cat, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-2 px-3 text-sm text-gray-700">${cat.order}</td>
+          <td class="py-2 px-3 text-sm text-gray-700">${cat.name}</td>
+          <td class="py-2 px-3 text-sm text-gray-700">${cat.url}</td>
+          <td class="py-2 px-3 text-sm text-gray-700 space-x-2">
+            <button data-action="edit" data-index="${idx}" class="text-blue-600 hover:text-blue-900">수정</button>
+            <button data-action="delete" data-index="${idx}" class="text-red-600 hover:text-red-900">삭제</button>
+            <button data-action="subcat" data-index="${idx}" class="text-green-600 hover:text-green-900">서브카테고리</button>
+          </td>
+        `;
+        listEl.appendChild(tr);
+        // 서브카테고리 행
+        const subTr = document.createElement('tr');
+        subTr.id = `subcat-row-${idx}`;
+        subTr.style.display = 'none';
+        subTr.innerHTML = `<td colspan="4" class="bg-gray-100">
+            <div class="p-4">
+              <h4 class="font-semibold mb-2">서브카테고리 관리</h4>
+              <ul id="subcat-list-${idx}" class="list-disc pl-5 mb-2"></ul>
+              <form id="subcat-form-${idx}" class="flex items-center space-x-2">
+                <input type="text" placeholder="이름" class="border p-1 rounded" required />
+                <input type="number" placeholder="순서" class="border p-1 w-16 rounded" required />
+                <button type="submit" class="px-2 py-1 bg-blue-600 text-white rounded">추가</button>
+              </form>
+            </div>
+          </td>`;
+        listEl.appendChild(subTr);
+      });
+      attachCategoryEvents();
+    }
+
+    function attachCategoryEvents() {
+      // 카테고리 버튼 이벤트
+      listEl.querySelectorAll('button[data-action]').forEach(btn => {
+        const action = btn.getAttribute('data-action');
+        const idx = parseInt(btn.getAttribute('data-index'));
+        btn.onclick = () => {
+          if (action === 'edit') {
+            const cat = categories[idx];
+            document.getElementById('menu-category-name').value = cat.name;
+            document.getElementById('menu-category-url').value = cat.url;
+            document.getElementById('menu-category-order').value = cat.order;
+            editIndex = idx;
+            form.querySelector('button[type="submit"]').textContent = '수정';
+          } else if (action === 'delete') {
+            categories.splice(idx, 1);
+            renderCategories();
+          } else if (action === 'subcat') {
+            const row = document.getElementById(`subcat-row-${idx}`);
+            row.style.display = row.style.display === 'none' ? '' : 'none';
+            renderSubcategories(idx);
+          }
+        };
+      });
+      // 서브카테고리 폼 이벤트
+      categories.forEach((cat, idx) => {
+        const subForm = document.getElementById(`subcat-form-${idx}`);
+        const subList = document.getElementById(`subcat-list-${idx}`);
+        subForm.onsubmit = e => {
+          e.preventDefault();
+          const name = subForm.querySelector('input[type=text]').value.trim();
+          const order = parseInt(subForm.querySelector('input[type=number]').value);
+          if (!cat.subcategories) cat.subcategories = [];
+          cat.subcategories.push({ name, order });
+          subForm.reset();
+          renderSubcategories(idx);
+        };
+      });
+    }
+
+    function renderSubcategories(idx) {
+      const cat = categories[idx];
+      const subList = document.getElementById(`subcat-list-${idx}`);
+      subList.innerHTML = '';
+      if (cat.subcategories) {
+        cat.subcategories.forEach((sub, sidx) => {
+          const li = document.createElement('li');
+          li.className = 'flex justify-between items-center';
+          li.innerHTML = `
+            <span>${sub.name} (순서: ${sub.order})</span>
+            <span>
+              <button data-action="editsub" data-cidx="${idx}" data-sidx="${sidx}" class="text-blue-600 hover:text-blue-900 mr-2">수정</button>
+              <button data-action="deletesub" data-cidx="${idx}" data-sidx="${sidx}" class="text-red-600 hover:text-red-900">삭제</button>
+            </span>
+          `;
+          subList.appendChild(li);
+        });
+        // 서브카테고리 버튼 이벤트
+        subList.querySelectorAll('button[data-action]').forEach(btn => {
+          const action = btn.getAttribute('data-action');
+          const cidx = parseInt(btn.getAttribute('data-cidx'));
+          const sidx = parseInt(btn.getAttribute('data-sidx'));
+          btn.onclick = () => {
+            const cat = categories[cidx];
+            if (action === 'deletesub') {
+              cat.subcategories.splice(sidx, 1);
+              renderSubcategories(cidx);
+            } else if (action === 'editsub') {
+              const sub = cat.subcategories[sidx];
+              const name = prompt('새 이름을 입력하세요:', sub.name);
+              const order = prompt('새 순서를 입력하세요:', sub.order);
+              if (name !== null && order !== null) {
+                sub.name = name;
+                sub.order = parseInt(order);
+                renderSubcategories(cidx);
+              }
+            }
+          };
+        });
+      }
+    }
+
+    form.onsubmit = e => {
+      e.preventDefault();
+      const name = document.getElementById('menu-category-name').value.trim();
+      const url = document.getElementById('menu-category-url').value.trim();
+      const order = parseInt(document.getElementById('menu-category-order').value);
+      if (editIndex !== null) {
+        categories[editIndex] = { ...categories[editIndex], name, url, order };
+        editIndex = null;
+        form.querySelector('button[type="submit"]').textContent = '추가';
+      } else {
+        categories.push({ name, url, order, subcategories: [] });
+      }
+      form.reset();
+      renderCategories();
+    };
+
+    // 초기 렌더링
+    renderCategories();
+  })();
+</script>
+<script src="js/admin.js?v=20250626_2"></script>
+<script>
+// 페이지 로드 후 자동으로 카테고리 섹션 활성화 (테스트용)
+window.addEventListener('load', function() {
+    console.log('페이지 로드 완료 - 테스트를 위한 카테고리 섹션 활성화');
+    // window.menuCategories 확인
+    console.log('window.menuCategories 확인:', window.menuCategories);
+    
+    setTimeout(function() {
+        const catLink = document.querySelector('.nav-link[data-section="categories-section"]');
+        if (catLink) catLink.click();
+    }, 500);
+});
+</script>
+</body>
+</html>

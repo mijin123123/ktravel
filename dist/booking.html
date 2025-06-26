@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="TRIP STORE - 여행 예약" />
+    <title>예약하기 | TRIP STORE</title>
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#3498db',
+              'primary-dark': '#2980b9',
+              'primary-light': '#ecf5ff',
+              accent: '#f1c40f',
+              text: '#333333',
+              'text-light': '#777777',
+              background: '#ffffff',
+              'background-alt': '#f8f9fa',
+              border: '#e0e0e0',
+            },
+            fontFamily: {
+              sans: ['"Pretendard"', 'Noto Sans KR', 'sans-serif'],
+            },
+            boxShadow: {
+              'subtle': '0 4px 12px rgba(0, 0, 0, 0.05)',
+            }
+          },
+        },
+      }
+    </script>
+    <!-- Pretendard Font -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      body {
+        font-family: 'Pretendard', 'Noto Sans KR', 'sans-serif';
+        color: #333;
+        background-color: #f8f9fa;
+      }
+      .agreement-btn {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        text-align: left;
+        padding: 0.75rem 1rem;
+        background-color: white;
+        border: 1px solid #e5e7eb; /* border-gray-200 */
+        border-radius: 0.5rem; /* rounded-lg */
+        transition: border-color 0.2s;
+        font-size: 0.9rem;
+      }
+      .agreement-btn:hover {
+        border-color: #9ca3af; /* border-gray-400 */
+      }
+    </style>
+</head>
+<body class="bg-background-alt text-text">
+
+    <!-- App Container -->
+    <div id="app">
+
+      <!-- Header -->
+      <header id="main-header" class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-border">
+        <!-- 헤더 내용은 main.js를 통해 동적으로 로드됩니다. -->
+      </header>
+
+      <!-- Main Content -->
+      <main class="pt-24 md:pt-32">
+        <div class="max-w-screen-md mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="bg-white p-8 md:p-12 rounded-lg shadow-lg">
+                <h1 class="text-3xl font-bold text-center mb-4 text-text">여행자 정보 입력</h1>
+                <p class="text-center text-text-light mb-10">*는 필수 입력 항목입니다.</p>
+                
+                <form id="booking-form">
+                    <!-- 상품 정보 -->
+                    <div class="mb-8 pb-8 border-b">
+                        <label for="package-name" class="block text-lg font-semibold text-gray-800 mb-3">예약 상품</label>
+                        <input type="text" id="package-name" name="package-name" class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-lg focus:ring-primary focus:border-primary" readonly>
+                    </div>
+
+                    <!-- 여행자 정보 -->
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800">성인 1</h2>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="same-as-user" name="same-as-user" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                <label for="same-as-user" class="ml-2 block text-sm text-gray-900">예약자 정보와 동일</label>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <label for="korean-name" class="block text-sm font-medium text-gray-700 mb-2">한글 이름*</label>
+                                <div class="flex space-x-2">
+                                    <input type="text" id="korean-name" name="korean-name" placeholder="홍길동" class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                                    <button type="button" class="px-4 py-2 border border-primary text-primary bg-white rounded-lg">내국인</button>
+                                    <button type="button" class="px-4 py-2 border border-gray-300 text-gray-500 bg-white rounded-lg">외국인</button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="last-name-en" class="block text-sm font-medium text-gray-700 mb-2">영문 성*</label>
+                                    <input type="text" id="last-name-en" name="last-name-en" placeholder="HONG" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                                </div>
+                                <div>
+                                    <label for="first-name-en" class="block text-sm font-medium text-gray-700 mb-2">영문 이름*</label>
+                                    <input type="text" id="first-name-en" name="first-name-en" placeholder="GILDONG" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                                </div>
+                            </div>
+                             <p class="text-xs text-gray-500 mt-2">* 여권상의 영문 이름을 입력해 주세요.</p>
+
+                            <div>
+                                <label for="birthdate" class="block text-sm font-medium text-gray-700 mb-2">생년월일*</label>
+                                <div class="flex items-center space-x-2">
+                                    <input type="text" id="birthdate" name="birthdate" placeholder="19801212" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                                    <span class="text-gray-400">-</span>
+                                    <input type="text" id="gender-digit" name="gender-digit" maxlength="1" class="w-12 px-3 py-2 text-center border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                                    <span class="text-2xl text-gray-300">••••••</span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">* 만 18세 미만의 고객은 단독 예약이 불가하오니, 고객센터(1544-5252)로 문의 바랍니다.</p>
+                            </div>
+
+                            <div>
+                                <label for="contact" class="block text-sm font-medium text-gray-700 mb-2">연락처*</label>
+                                <input type="tel" id="contact" name="contact" placeholder="-없이 숫자만 입력해주세요" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                            </div>
+
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">이메일*</label>
+                                <div class="flex items-center space-x-2">
+                                    <input type="text" id="email-id" name="email-id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                                    <span class="text-gray-500">@</span>
+                                    <select id="email-domain" name="email-domain" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary bg-white">
+                                        <option>선택해 주세요</option>
+                                        <option value="naver.com">naver.com</option>
+                                        <option value="gmail.com">gmail.com</option>
+                                        <option value="daum.net">daum.net</option>
+                                        <option value="hanmail.net">hanmail.net</option>
+                                        <option value="nate.com">nate.com</option>
+                                        <option value="custom">직접입력</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 약관 동의 -->
+                    <div class="mt-12 pt-8 border-t">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">취소 및 약관 개인정보 이용 동의</h2>
+                        
+                        <!-- 전체 동의 -->
+                        <div class="flex items-center mb-6 p-4 bg-gray-50 rounded-lg border">
+                            <input type="checkbox" id="agree-all" name="agree-all" class="h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded">
+                            <label for="agree-all" class="ml-3 block text-lg font-semibold text-gray-900">전체동의</label>
+                        </div>
+
+                        <!-- 필수 동의 -->
+                        <div class="mb-6" id="required-agreements">
+                            <div class="flex items-center mb-4">
+                                <input type="checkbox" id="agree-required" name="agree-required" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                <label for="agree-required" class="ml-2 block text-base font-semibold text-gray-700">(필수)</label>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                                <button type="button" class="agreement-btn"><span>취소규정 동의</span> <i class="fas fa-chevron-right text-gray-400"></i></button>
+                                <button type="button" class="agreement-btn"><span>국외여행 약관 동의</span> <i class="fas fa-chevron-right text-gray-400"></i></button>
+                                <button type="button" class="agreement-btn"><span>증빙제공 및 환급규정 동의</span> <i class="fas fa-chevron-right text-gray-400"></i></button>
+                                <button type="button" class="agreement-btn"><span>개인정보 수집, 이용동의</span> <i class="fas fa-chevron-right text-gray-400"></i></button>
+                                <button type="button" class="agreement-btn"><span>고유식별정보 수집 및 이용 동의</span> <i class="fas fa-chevron-right text-gray-400"></i></button>
+                                <button type="button" class="agreement-btn"><span>개인정보 제 3자 제공동의</span> <i class="fas fa-chevron-right text-gray-400"></i></button>
+                                <button type="button" class="agreement-btn"><span>예약금 및 전체금액 결제 안내</span> <i class="fas fa-chevron-right text-gray-400"></i></button>
+                                <button type="button" class="agreement-btn"><span>상품가 비교사항</span> <i class="fas fa-chevron-right text-gray-400"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 선택 동의 -->
+                        <div class="mb-6" id="optional-agreements">
+                            <div class="flex items-center mb-4">
+                                <input type="checkbox" id="agree-optional" name="agree-optional" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                <label for="agree-optional" class="ml-2 block text-base font-semibold text-gray-700">(선택)</label>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                                <button type="button" class="agreement-btn"><span>개인정보 수집, 이용동의</span> <i class="fas fa-chevron-right text-gray-400"></i></button>
+                            </div>
+                        </div>
+                        
+                        <!-- 특별약관 안내 -->
+                        <div class="p-4 bg-gray-100 rounded-lg text-xs text-gray-600 mb-8 border">
+                            <p class="mb-2">이 상품은 <strong class="text-red-500">[특별약관]</strong> 상품입니다.</p>
+                            <p class="mb-1">취소 시 [국외]여행표준약관 제6조 특약에 의한 자체 특별약관이 적용되며, 공정거래위원회 소비자분쟁해결기준 제2019-03호에 우선합니다.</p>
+                            <p>분쟁해결기준보다 높은 수수료가 부과될 수 있고, 별도의 동의절차를 거치니 필히 규정을 확인해주시기 바랍니다.</p>
+                        </div>
+
+                        <!-- 문의/추가 요청사항 -->
+                        <div class="mb-10">
+                            <label for="additional-requests" class="block text-lg font-semibold text-gray-800 mb-3">문의/추가 요청사항</label>
+                            <textarea id="additional-requests" name="additional-requests" rows="5" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary" placeholder="내용을 입력해주세요."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 결제 정보 -->
+                    <div class="mt-12 pt-8 border-t">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">결제 안내</h2>
+                        <div class="p-6 bg-gray-50 rounded-lg border">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">무통장 입금</h3>
+                            <p class="text-gray-600 mb-4">예약 요청 후, 담당자가 확인하여 입금 안내를 드릴 예정입니다. 아래 계좌 정보를 참고하여 입금해주시기 바랍니다.</p>
+                            <div class="p-4 bg-white rounded-md border space-y-2">
+                                <p><strong class="font-medium text-gray-700 w-24 inline-block">은행:</strong> K-트래블 은행</p>
+                                <p><strong class="font-medium text-gray-700 w-24 inline-block">계좌번호:</strong> 123-456-789012</p>
+                                <p><strong class="font-medium text-gray-700 w-24 inline-block">예금주:</strong> (주)케이여행</p>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-4">* 입금 시 예약자 성함으로 입금해주셔야 빠른 확인이 가능합니다.</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg mt-12">예약 요청하기</button>
+                </form>
+            </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer id="main-footer" class="bg-primary-light text-text-light">
+        <!-- 푸터 내용은 main.js를 통해 동적으로 로드됩니다. -->
+      </footer>
+
+    </div>
+
+    <!-- Terms Modal -->
+    <div id="terms-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[100] hidden items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col transform scale-95 transition-transform duration-300">
+            <div class="flex justify-between items-center p-5 border-b">
+                <h3 id="modal-title" class="text-xl font-bold text-gray-800"></h3>
+                <button id="modal-close" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            </div>
+            <div id="modal-content" class="p-6 overflow-y-auto text-gray-600 leading-relaxed">
+                <!-- Content will be injected here -->
+            </div>
+            <div class="p-4 bg-gray-50 border-t text-right">
+                <button id="modal-confirm" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-6 rounded-lg transition-colors">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const packageName = urlParams.get('packageName');
+            const packageNameInput = document.getElementById('package-name');
+            if (packageName && packageNameInput) {
+                packageNameInput.value = decodeURIComponent(packageName);
+            }
+
+            // --- 약관 동의 로직 ---
+            const agreeAll = document.getElementById('agree-all');
+            const requiredCheckbox = document.getElementById('agree-required');
+            const optionalCheckbox = document.getElementById('agree-optional');
+            
+            if (agreeAll && requiredCheckbox && optionalCheckbox) {
+                const allSubCheckboxes = [requiredCheckbox, optionalCheckbox];
+
+                agreeAll.addEventListener('change', () => {
+                    allSubCheckboxes.forEach(chk => {
+                        chk.checked = agreeAll.checked;
+                    });
+                });
+
+                allSubCheckboxes.forEach(chk => {
+                    chk.addEventListener('change', () => {
+                        agreeAll.checked = allSubCheckboxes.every(c => c.checked);
+                    });
+                });
+            }
+
+            // --- 약관 모달 로직 ---
+            const termsModal = document.getElementById('terms-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            const modalClose = document.getElementById('modal-close');
+            const modalConfirm = document.getElementById('modal-confirm');
+            const agreementButtons = document.querySelectorAll('.agreement-btn');
+
+            const termsContent = {
+                '취소규정 동의': `
+                    <h4 class="font-bold text-lg mb-2">제1조 (목적)</h4>
+                    <p class="mb-4">본 약관은 K-Travel(이하 '회사')가 제공하는 여행상품의 예약 취소 및 환불에 관한 규정을 정함을 목적으로 합니다.</p>
+                    <h4 class="font-bold text-lg mb-2">제2조 (취소 수수료)</h4>
+                    <p>여행자의 여행계약 해제 요청 시 여행약관에 의거하여 취소 수수료가 부과됩니다.<br>
+                    - 여행출발 30일전 통보시: 계약금 환급<br>
+                    - 여행출발 20일전 통보시: 총 상품가격의 10% 배상<br>
+                    - 여행출발 10일전 통보시: 총 상품가격의 15% 배상<br>
+                    - 여행출발 8일전 통보시: 총 상품가격의 20% 배상<br>
+                    - 여행출발 1일전 통보시: 총 상품가격의 30% 배상<br>
+                    - 여행 당일 통보시: 총 상품가격의 50% 배상</p>
+                    <p class="mt-4 text-sm text-red-600">* 특별약관 상품의 경우, 별도의 취소 규정이 적용될 수 있으니 상품 상세 정보를 반드시 확인하시기 바랍니다.</p>
+                `,
+                '국외여행 약관 동의': `<p>국외여행 표준약관의 상세 내용은 공정거래위원회 홈페이지에서 확인하실 수 있습니다. 여행자는 국외여행 표준약관을 숙지하였으며 이에 동의합니다.</p>`,
+                '증빙제공 및 환급규정 동의': `<p>취소 수수료 면제 및 감면을 위한 증빙 서류(진단서 등)는 지정된 기한 내에 제출해야 하며, 기한 초과 시 일반 취소 규정이 적용됩니다. 환급은 제출된 서류 심사 후 진행되며, 영업일 기준 최대 14일이 소요될 수 있습니다.</p>`,
+                '개인정보 수집, 이용동의': `
+                    <h4 class="font-bold text-lg mb-2">1. 수집하는 개인정보 항목</h4>
+                    <p class="mb-4">회사는 상담, 서비스 신청 등을 위해 아래와 같은 개인정보를 수집하고 있습니다.<br>- 필수항목 : 한글/영문 이름, 생년월일, 성별, 연락처, 이메일, 여권정보</p>
+                    <h4 class="font-bold text-lg mb-2">2. 개인정보의 수집 및 이용목적</h4>
+                    <p>회사는 수집한 개인정보를 다음의 목적을 위해 활용합니다.<br>- 여행상품 예약 및 상담, 서비스 이행(항공권 발권, 호텔 예약 등)<br>- 여행 관련 정보 제공 및 안내</p>
+                `,
+                '고유식별정보 수집 및 이용 동의': `<p>고유식별정보(여권번호)는 항공권 발권, 여행자 보험 가입 등 관련 법령에 따른 업무 처리를 위해서만 수집 및 이용되며, 이용 목적 달성 후 안전하게 파기됩니다.</p>`,
+                '개인정보 제 3자 제공동의': `<p>수집된 개인정보는 원활한 여행 서비스 제공을 위해 항공사, 현지 여행사, 숙박업체, 보험사 등 국내외 협력업체에 제공될 수 있습니다. 제공되는 정보는 서비스 제공 목적 외 다른 용도로 사용되지 않습니다.</p>`,
+                '예약금 및 전체금액 결제 안내': `<p>예약 확정을 위해 예약 후 24시간 이내에 지정된 예약금을 결제해야 합니다. 잔금은 여행 출발일 기준 14일 전까지 완납되어야 하며, 미결제 시 예약이 자동으로 취소될 수 있습니다.</p>`,
+                '상품가 비교사항': `<p>홈페이지에 표시된 상품가는 유류할증료 및 제세공과금이 포함된 가격입니다. 단, 유가 및 환율 변동에 따라 해당 금액은 예고 없이 변경될 수 있으며, 변경 시 차액이 발생할 수 있습니다.</p>`,
+                '개인정보 수집, 이용동의 (선택)': `<p>K-Travel의 새로운 여행 상품, 이벤트, 프로모션 등 마케팅 정보 수신(이메일, SMS 등)에 동의합니다. 이 동의는 거부할 수 있으며, 거부 시에도 기본 서비스 이용에는 제한이 없습니다.</p>`
+            };
+
+            const openModal = (title, content) => {
+                if (termsModal && modalTitle && modalContent) {
+                    modalTitle.textContent = title;
+                    modalContent.innerHTML = content;
+                    termsModal.classList.remove('hidden');
+                    termsModal.classList.add('flex');
+                    // Delay for transition
+                    setTimeout(() => {
+                        termsModal.classList.remove('opacity-0', 'scale-95');
+                    }, 10);
+                }
+            };
+
+            const closeModal = () => {
+                if (termsModal) {
+                    termsModal.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => {
+                        termsModal.classList.add('hidden');
+                        termsModal.classList.remove('flex');
+                    }, 300); // Match transition duration
+                }
+            };
+
+            agreementButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const termTitle = button.querySelector('span').textContent;
+                    let contentKey = termTitle;
+                    
+                    // 선택 약관의 '개인정보 수집, 이용동의'는 내용이 다르므로 구분
+                    if (button.closest('#optional-agreements') && termTitle === '개인정보 수집, 이용동의') {
+                        contentKey = '개인정보 수집, 이용동의 (선택)';
+                    }
+                    
+                    const termContent = termsContent[contentKey] || '<p>약관 정보가 없습니다.</p>';
+                    openModal(termTitle, termContent);
+                });
+            });
+
+            if (modalClose) modalClose.addEventListener('click', closeModal);
+            if (modalConfirm) modalConfirm.addEventListener('click', closeModal);
+            if (termsModal) {
+                termsModal.addEventListener('click', (e) => {
+                    if (e.target === termsModal) {
+                        closeModal();
+                    }
+                });
+            }
+
+            // --- 폼 제출 로직 ---
+            const bookingForm = document.getElementById('booking-form');
+            if (bookingForm) {
+                bookingForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (requiredCheckbox && !requiredCheckbox.checked) {
+                        alert('필수 약관에 모두 동의해주셔야 예약 요청이 가능합니다.');
+                        return;
+                    }
+                    
+                    // 실제 예약 처리 로직 (예: 서버로 데이터 전송)
+                    alert('예약이 요청되었습니다. 확인 후 연락드리겠습니다.');
+                    // 성공 시 확인 페이지로 이동
+                    // window.location.href = 'booking-confirmation.html';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
