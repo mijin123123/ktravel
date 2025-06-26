@@ -20,22 +20,37 @@ const Header = () => {
   const location = useLocation();
   
   useEffect(() => {
-    const savedMenuData = localStorage.getItem('menuCategories');
-    if (savedMenuData) {
+    const fetchMenuData = async () => {
       try {
-        const parsedData = JSON.parse(savedMenuData);
-        // url 속성이 없는 경우를 대비하여 / 로 기본값을 설정해줍니다.
-        const validatedData = parsedData.map((item: any) => ({...item, url: item.url || '/'}));
+        // 캐시를 방지하기 위해 타임스탬프를 추가합니다.
+        const response = await fetch(`/menu.json?t=${new Date().getTime()}`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data: MenuCategory[] = await response.json();
+        
+        // 데이터 유효성을 검사하고 URL을 React Router에 맞게 변환합니다.
+        const validatedData = data.map((item) => {
+            let newUrl = item.url.replace(/\.html$/, ''); // .html 확장자 제거
+            if (newUrl === 'index') {
+                newUrl = ''; // index는 루트 경로로 매핑
+            }
+            return {
+                ...item,
+                url: `/${newUrl}`,
+                sub: item.sub || [],
+            };
+        });
+        
         setMenuData(validatedData);
       } catch (error) {
-        console.error("Failed to parse menu data from localStorage", error);
-        // 파싱 실패 시 기본 메뉴를 사용합니다.
+        console.error("Failed to fetch or parse menu.json:", error);
+        // 에러 발생 시 기본 메뉴 데이터를 사용합니다.
         setMenuData(getDefaultMenu());
       }
-    } else {
-      // localStorage에 데이터가 없을 경우 기본 메뉴를 사용합니다.
-      setMenuData(getDefaultMenu());
-    }
+    };
+
+    fetchMenuData();
   }, []);
 
   const getDefaultMenu = (): MenuCategory[] => {
