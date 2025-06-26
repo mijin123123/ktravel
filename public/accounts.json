@@ -1,0 +1,23 @@
+[
+  {
+    "id": "acc001",
+    "bankName": "신한은행",
+    "accountNumber": "110-123-456789",
+    "accountHolder": "주식회사 케이트래블",
+    "isDefault": true
+  },
+  {
+    "id": "acc002",
+    "bankName": "국민은행",
+    "accountNumber": "220-456-789123",
+    "accountHolder": "주식회사 케이트래블",
+    "isDefault": false
+  },
+  {
+    "id": "acc003",
+    "bankName": "농협은행",
+    "accountNumber": "330-789-123456",
+    "accountHolder": "주식회사 케이트래블",
+    "isDefault": false
+  }
+]

@@ -65,3 +65,41 @@ export interface Booking {
   createdAt: string;
   paymentStatus: 'pending' | 'partial' | 'complete';
 }
+
+// 계좌 타입
+export interface Account {
+  id: string;
+  bankName: string;
+  accountNumber: string;
+  accountHolder: string;
+  isDefault: boolean;
+}
+
+// 푸터 컨텐츠 타입
+export interface FooterLink {
+  text: string;
+  url: string;
+}
+
+export interface FooterSection {
+  title: string;
+  links: FooterLink[];
+}
+
+export interface CustomerCenter {
+  title: string;
+  info: string[];
+}
+
+export interface SocialLink {
+  name: string;
+  url: string;
+}
+
+export interface FooterContent {
+  description: string;
+  packages: FooterSection;
+  company: FooterSection;
+  customerCenter: CustomerCenter;
+  social: SocialLink[];
+}
