@@ -1,0 +1,92 @@
+[
+    {
+        "name": "베스트",
+        "url": "best.html",
+        "order": "1",
+        "sub": [
+            { "name": "유럽", "order": "1" },
+            { "name": "아시아", "order": "2" },
+            { "name": "미국", "order": "3" },
+            { "name": "오세아니아", "order": "4" }
+        ]
+    },
+    {
+        "name": "해외여행",
+        "url": "packages.html",
+        "order": "2",
+        "sub": [
+            { "name": "가족 여행", "order": "1" },
+            { "name": "신혼 여행", "order": "2" },
+            { "name": "친구 여행", "order": "3" },
+            { "name": "단체 여행", "order": "4" }
+        ]
+    },
+    {
+        "name": "호텔",
+        "url": "hotels.html",
+        "order": "3",
+        "sub": [
+            { "name": "5성급 호텔", "order": "1" },
+            { "name": "리조트", "order": "2" },
+            { "name": "풀빌라", "order": "3" }
+        ]
+    },
+    {
+        "name": "투어/입장권",
+        "url": "tours-tickets.html",
+        "order": "4",
+        "sub": [
+            { "name": "명소 입장권", "order": "1" },
+            { "name": "액티비티", "order": "2" },
+            { "name": "시티투어", "order": "3" }
+        ]
+    },
+    {
+        "name": "국내숙소",
+        "url": "domestic.html",
+        "order": "5",
+        "sub": [
+            { "name": "제주도", "order": "1" },
+            { "name": "부산", "order": "2" },
+            { "name": "강원도", "order": "3" },
+            { "name": "경상도", "order": "4" }
+        ]
+    },
+    {
+        "name": "골프",
+        "url": "golf.html",
+        "order": "6",
+        "sub": [
+            { "name": "국내 골프", "order": "1" },
+            { "name": "해외 골프", "order": "2" }
+        ]
+    },
+    {
+        "name": "테마여행",
+        "url": "theme.html",
+        "order": "7",
+        "sub": [
+            { "name": "크루즈", "order": "1" },
+            { "name": "사파리", "order": "2" },
+            { "name": "투어", "order": "3" }
+        ]
+    },
+    {
+        "name": "맞춤여행",
+        "url": "custom.html",
+        "order": "8",
+        "sub": [
+            { "name": "개인 맞춤", "order": "1" },
+            { "name": "기업 맞춤", "order": "2" }
+        ]
+    },
+    {
+        "name": "이달의 혜택",
+        "url": "benefits.html",
+        "order": "9",
+        "sub": [
+            { "name": "특가 상품", "order": "1" },
+            { "name": "시즌 혜택", "order": "2" }
+        ]
+    }
+]
