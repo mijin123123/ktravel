@@ -41,78 +41,85 @@ const Packages = () => {
   // Fetch packages based on URL parameters
   useEffect(() => {
     const fetchPackagesByCategory = async () => {
-      if (menuItems.length === 0) return; // Wait for menu items to be loaded
+      // 메뉴 아이템이 로드될 때까지 기다립니다.
+      if (menuItems.length === 0) {
+        // URL에 카테고리가 지정되었지만 메뉴가 아직 로드되지 않은 경우
+        if (category) {
+          setPageTitle('메뉴 로딩 중...');
+        }
+        return;
+      }
 
       setIsLoading(true);
       setError(null);
 
       try {
-        console.log('Fetching products with params:', { category, subcategory });
-        
         let query = supabase.from('products').select('*');
         let title = '전체 여행 상품';
+        let categoryFound = false;
 
-        const parentCategory = menuItems.find(m => m.url === category && m.parent_id === null);
-        const childCategory = menuItems.find(m => m.url === subcategory && m.parent_id !== null);
-
-        console.log('Categories found:', { parentCategory, childCategory });
-
-        if (parentCategory && childCategory) {
-          // Subcategory page (e.g., /best/europe)
-          query = query.eq('category', childCategory.name);
-          title = `${parentCategory.name} > ${childCategory.name}`;
-        } else if (parentCategory) {
-          // Parent category page (e.g., /best)
-          const childCategories = menuItems.filter(m => m.parent_id === parentCategory.id);
-          if (childCategories.length > 0) {
-            const categoryNames = childCategories.map(c => c.name);
-            console.log('Using child categories:', categoryNames);
-            query = query.in('category', categoryNames);
-          } else {
-            // A parent category that is also a product category (e.g., /domestic)
-            query = query.eq('category', parentCategory.name);
-          }
-          title = parentCategory.name;
-        }
-        
-        setPageTitle(title);
-        
-        console.log('Executing Supabase query...');
-        // 먼저 products 테이블 구조 확인 
-        const { data: columnsData, error: columnsError } = await supabase
-          .from('products')
-          .select('*')
-          .limit(1);
+        if (category) {
+          const parentCategory = menuItems.find(m => m.url === category && m.parent_id === null);
           
-        if (columnsError) {
-          console.error('Error checking products table:', columnsError);
-        } else if (columnsData && columnsData.length > 0) {
-          console.log('Products table columns:', Object.keys(columnsData[0]));
+          if (parentCategory) {
+            categoryFound = true;
+            title = parentCategory.name;
+            
+            // 서브 카테고리 처리
+            if (subcategory) {
+              const childCategory = menuItems.find(m => m.url === subcategory && m.parent_id === parentCategory.id);
+              if (childCategory) {
+                query = query.eq('category', childCategory.name);
+                title = `${parentCategory.name} > ${childCategory.name}`;
+              } else {
+                console.warn(`Subcategory "${subcategory}" not found for parent "${category}"`);
+                setError(`'${subcategory}' 하위 카테고리를 찾을 수 없습니다.`);
+                categoryFound = false; // 유효하지 않은 카테고리로 처리
+              }
+            } else { // 메인 카테고리 처리
+              const childCategories = menuItems.filter(m => m.parent_id === parentCategory.id);
+              if (childCategories.length > 0) {
+                const categoryNames = childCategories.map(c => c.name);
+                query = query.in('category', categoryNames);
+              } else {
+                // 하위 카테고리가 없는 메인 카테고리 (e.g. 국내숙소)
+                query = query.eq('category', parentCategory.name);
+              }
+            }
+          }
+        } else {
+          // URL에 카테고리가 없으면 전체 상품 표시
+          categoryFound = true; 
         }
-        
-        const { data, error: queryError } = await query.order('created_at', { ascending: false });
 
-        if (queryError) {
-          console.error('Supabase query error:', queryError);
-          throw queryError;
+        if (category && !categoryFound) {
+          // URL에 카테고리가 있지만 메뉴에서 찾지 못한 경우
+          console.error(`Category or subcategory not found for: /${category}${subcategory ? '/' + subcategory : ''}`);
+          setError(`'${subcategory || category}' 카테고리 정보를 찾을 수 없습니다.`);
+          setPageTitle('오류');
+          setAllPackages([]);
+        } else {
+          // 정상적으로 쿼리 실행
+          setPageTitle(title);
+          const { data, error: queryError } = await query.order('created_at', { ascending: false });
+
+          if (queryError) {
+            throw queryError;
+          }
+          
+          setAllPackages(data || []);
         }
-        
-        console.log('Products fetched:', data ? data.length : 0);
-        setAllPackages(data || []);
+
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
         console.error("상품 정보 로딩 실패:", errorMessage);
-        setError(errorMessage);
+        setError('상품 정보를 불러오는 중 오류가 발생했습니다.');
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (menuItems.length > 0) {
-        fetchPackagesByCategory();
-    } else {
-        setPageTitle('상품 로딩 중...');
-    }
+    fetchPackagesByCategory();
 
   }, [category, subcategory, menuItems]);
 
