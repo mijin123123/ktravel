@@ -55,9 +55,9 @@ const Booking = () => {
   }
 
   const price = pkg.price || 0;
-  const discount = pkg.discountRate || 0;
+  const discountRate = pkg.discountRate || 0;
   const numTravelers = Number(travelers || 1);
-  const totalPrice = price * (1 - discount) * numTravelers;
+  const totalPrice = price * (1 - discountRate) * numTravelers;
 
   const handlePayment = () => {
     const params = new URLSearchParams();
