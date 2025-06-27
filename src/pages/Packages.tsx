@@ -68,8 +68,16 @@ const Packages = () => {
             
             // 서브 카테고리 처리
             if (subcategory) {
-              // 서브카테고리도 동일하게 처리합니다.
-              const childCategory = menuItems.find(m => m.url.replace(/^\//, '') === subcategory && m.parent_id === parentCategory.id);
+              // 다양한 URL 형식에 대응하기 위해 여러 조건을 검사합니다.
+              // 1. 정확히 일치하는 경우
+              // 2. 슬래시를 제거한 경우 
+              // 3. 전체 URL 경로에 parent/child 형태로 저장된 경우
+              const childCategory = menuItems.find(m => 
+                (m.url.replace(/^\//, '') === subcategory && m.parent_id === parentCategory.id) ||  // 기본 URL 매칭
+                (m.url === `${category}/${subcategory}` && m.parent_id === parentCategory.id) ||    // 전체 경로 매칭
+                (m.name === subcategory && m.parent_id === parentCategory.id)                       // 이름으로 매칭
+              );
+              
               if (childCategory) {
                 query = query.eq('category', childCategory.name);
                 title = `${parentCategory.name} > ${childCategory.name}`;
