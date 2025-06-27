@@ -75,16 +75,20 @@ const Packages = () => {
             if (subcategory) {
               const subcategoryLower = subcategory.toLowerCase();
               
-              // 하위 카테고리를 URL 경로의 마지막 부분과 비교하여 찾기
+              // 하위 카테고리를 URL 경로의 마지막 부분을 이용해 찾기
               const childCategory = menuItems.find(m => {
+                // 1. 올바른 부모의 자식인지 확인
                 if (m.parent_id !== parentCategory.id) return false;
                 
-                // m.url을 정규화 (e.g., '/best/japan' -> 'best/japan')
-                const normalizedUrl = m.url.toLowerCase().replace(/^\//, '');
-                const urlParts = normalizedUrl.split('/');
-                const lastUrlPart = urlParts[urlParts.length - 1];
+                // 2. URL이 유효한지 확인
+                if (!m.url) return false;
                 
-                return lastUrlPart === subcategoryLower;
+                // 3. URL 경로의 마지막 부분이 subcategory와 일치하는지 확인
+                // e.g., /best/japan -> japan, /japan -> japan
+                const normalizedUrl = m.url.toLowerCase().replace(/^\//, '');
+                const lastUrlSegment = normalizedUrl.substring(normalizedUrl.lastIndexOf('/') + 1);
+                
+                return lastUrlSegment === subcategoryLower;
               });
               
               if (childCategory) {
