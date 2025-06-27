@@ -143,6 +143,7 @@ const ManageProducts = () => {
 
       {isModalOpen && (
         <ProductModal
+          isOpen={isModalOpen}
           product={selectedProduct}
           onClose={handleCloseModal}
           onSave={handleSaveProduct}
