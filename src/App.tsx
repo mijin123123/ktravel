@@ -9,6 +9,7 @@ import Contact from './pages/Contact'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import NotFound from './pages/NotFound'
+import Booking from './pages/Booking'
 
 // 새로운 관리자 페이지 컴포넌트 임포트
 import AdminLayout from './pages/admin/AdminLayout'
@@ -43,6 +44,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/booking" element={<Booking />} />
 
         {/* 상품 관련 페이지 */}
         <Route path="/packages" element={<Packages />} />
