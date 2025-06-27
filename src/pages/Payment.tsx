@@ -1,13 +1,41 @@
 // src/pages/Payment.tsx
 import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
+import { AccountInfo } from '../types';
 
 const Payment = () => {
   const [searchParams] = useSearchParams();
+  const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const packageName = searchParams.get('packageName');
   const totalPrice = searchParams.get('totalPrice');
   const date = searchParams.get('date');
   const travelers = searchParams.get('travelers');
+
+  useEffect(() => {
+    const fetchAccountInfo = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('account_info')
+          .select('*')
+          .single();
+
+        if (error) {
+          throw error;
+        }
+        setAccountInfo(data);
+      } catch (error) {
+        console.error('Error fetching account info:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAccountInfo();
+  }, []);
 
   const handleConfirmPayment = () => {
     // 실제로는 여기서 결제 API를 호출합니다.
@@ -39,6 +67,23 @@ const Payment = () => {
             <p className="text-2xl font-bold text-blue-600">{totalPrice ? `${Number(totalPrice).toLocaleString()}원` : '정보 없음'}</p>
           </div>
         </div>
+
+        {/* 계좌 정보 */}
+        {loading ? (
+          <p className="text-center mt-6">계좌 정보 로딩 중...</p>
+        ) : accountInfo ? (
+          <div className="border-t pt-6 mt-6">
+            <h3 className="text-xl font-bold mb-4 text-center">입금 계좌 안내</h3>
+            <div className="bg-gray-50 p-4 rounded-lg text-center">
+              <p className="font-semibold">{accountInfo.bank_name}</p>
+              <p className="my-1">{accountInfo.account_number}</p>
+              <p>예금주: {accountInfo.account_holder}</p>
+            </div>
+          </div>
+        ) : (
+           <p className="text-center mt-6 text-red-500">계좌 정보를 불러오지 못했습니다.</p>
+        )}
+
         <button 
           onClick={handleConfirmPayment}
           className="mt-8 w-full bg-green-500 text-white py-3 rounded-md font-bold hover:bg-green-600 transition-colors"

@@ -54,7 +54,10 @@ const Booking = () => {
     return <div className="container-custom py-12 text-center">상품 정보를 찾을 수 없습니다.</div>;
   }
 
-  const totalPrice = pkg.price * (1 - pkg.discountRate) * Number(travelers || 1);
+  const price = pkg.price || 0;
+  const discount = pkg.discountRate || 0;
+  const numTravelers = Number(travelers || 1);
+  const totalPrice = price * (1 - discount) * numTravelers;
 
   const handlePayment = () => {
     const params = new URLSearchParams();

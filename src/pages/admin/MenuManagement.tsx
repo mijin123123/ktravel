@@ -61,13 +61,21 @@ const MenuManagement = () => {
     e.preventDefault();
     if (!editingItem) return;
 
-    const { id, ...updateData } = editingItem;
+    const dataToSubmit = {
+      name: editingItem.name || '',
+      url: editingItem.url || '',
+      parent_id: editingItem.parent_id === undefined ? null : editingItem.parent_id,
+    };
 
     let response;
     if (isNew) {
-      response = await supabase.from('menu').insert(updateData).select();
+      response = await supabase.from('menu').insert(dataToSubmit).select();
     } else {
-      response = await supabase.from('menu').update(updateData).eq('id', id);
+      if (editingItem.id === undefined) {
+        alert('메뉴 수정을 위한 ID가 없습니다.');
+        return;
+      }
+      response = await supabase.from('menu').update(dataToSubmit).eq('id', editingItem.id);
     }
 
     if (response.error) {
