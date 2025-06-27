@@ -174,11 +174,11 @@ const Packages = () => {
                   <div className="mt-4">
                     {pkg.discountRate > 0 && (
                       <span className="text-gray-500 line-through mr-2">
-                        {pkg.price.toLocaleString()}원
+                        {(pkg.price || 0).toLocaleString()}원
                       </span>
                     )}
                     <span className="text-red-500 font-bold text-lg">
-                      {(pkg.price * (1 - pkg.discountRate)).toLocaleString()}원
+                      {((pkg.price || 0) * (1 - (pkg.discountRate || 0))).toLocaleString()}원
                     </span>
                   </div>
                 </div>
