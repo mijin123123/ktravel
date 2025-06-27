@@ -17,14 +17,6 @@ import ManageBookings from './pages/admin/ManageBookings'
 import ManageProducts from './pages/admin/ManageProducts'
 import ManageAccounts from './pages/admin/ManageAccounts'
 import EditFooter from './pages/admin/EditFooter'
-import Best from './pages/Best'
-import Hotels from './pages/Hotels'
-import Domestic from './pages/Domestic'
-import Golf from './pages/Golf'
-import Theme from './pages/Theme'
-import Custom from './pages/Custom'
-import Benefits from './pages/Benefits'
-import ToursTickets from './pages/ToursTickets'
 
 // 일반 사용자용 레이아웃
 const PublicLayout = () => (
@@ -43,20 +35,22 @@ function App() {
       {/* --- 일반 사용자 페이지 --- */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/packages" element={<Packages />} />
-        <Route path="/packages/:id" element={<PackageDetail />} />
+
+        {/* 정적 페이지 (동적 라우트보다 항상 위에 있어야 합니다) */}
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/best" element={<Best />} />
-        <Route path="/hotels" element={<Hotels />} />
-        <Route path="/domestic" element={<Domestic />} />
-        <Route path="/golf" element={<Golf />} />
-        <Route path="/theme" element={<Theme />} />
-        <Route path="/custom" element={<Custom />} />
-        <Route path="/benefits" element={<Benefits />} />
-        <Route path="/tours-tickets" element={<ToursTickets />} />
+
+        {/* 상품 관련 페이지 */}
+        <Route path="/packages" element={<Packages />} />
+        <Route path="/product/:id" element={<PackageDetail />} />
+
+        {/* 동적 카테고리 라우트 */}
+        {/* /best, /domestic, /best/europe 같은 모든 카테고리/서브카테고리 경로를 처리합니다. */}
+        {/* 다른 정적 경로와 충돌하지 않도록 가장 마지막에 배치합니다. */}
+        <Route path="/:category" element={<Packages />} />
+        <Route path="/:category/:subcategory" element={<Packages />} />
       </Route>
 
       {/* --- 관리자 페이지 --- */}
