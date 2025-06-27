@@ -12,6 +12,7 @@ export interface TravelPackage {
   description: string;
   rating: number;
   type: string;
+  created_at: string; // Supabase에서 자동 생성되는 필드
 }
 
 // 상세 여행 패키지 타입

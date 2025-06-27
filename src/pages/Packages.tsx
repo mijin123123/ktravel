@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { TravelPackage, Menu } from '../types';
+import { TravelPackage, MenuCategory } from '../types';
 import { supabase } from '../lib/supabaseClient';
 
 const Packages = () => {
@@ -20,15 +20,18 @@ const Packages = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pageTitle, setPageTitle] = useState('전체 여행 상품');
-  const [menuItems, setMenuItems] = useState<Menu[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuCategory[]>([]);
 
   // Fetch all menu items once to use for category mapping
   useEffect(() => {
     const fetchMenu = async () => {
+      console.log('Fetching menu items...');
       const { data, error } = await supabase.from('menu').select('*');
+      
       if (error) {
         console.error('Error fetching menu:', error);
       } else {
+        console.log('Menu items fetched:', data?.length || 0);
         setMenuItems(data || []);
       }
     };
@@ -44,11 +47,15 @@ const Packages = () => {
       setError(null);
 
       try {
+        console.log('Fetching products with params:', { category, subcategory });
+        
         let query = supabase.from('products').select('*');
         let title = '전체 여행 상품';
 
         const parentCategory = menuItems.find(m => m.url === category && m.parent_id === null);
         const childCategory = menuItems.find(m => m.url === subcategory && m.parent_id !== null);
+
+        console.log('Categories found:', { parentCategory, childCategory });
 
         if (parentCategory && childCategory) {
           // Subcategory page (e.g., /best/europe)
@@ -59,6 +66,7 @@ const Packages = () => {
           const childCategories = menuItems.filter(m => m.parent_id === parentCategory.id);
           if (childCategories.length > 0) {
             const categoryNames = childCategories.map(c => c.name);
+            console.log('Using child categories:', categoryNames);
             query = query.in('category', categoryNames);
           } else {
             // A parent category that is also a product category (e.g., /domestic)
@@ -68,16 +76,51 @@ const Packages = () => {
         }
         
         setPageTitle(title);
-
+        
+        console.log('Executing Supabase query...');
+        // 먼저 products 테이블 구조 확인 
+        const { data: columnsData, error: columnsError } = await supabase
+          .from('products')
+          .select('*')
+          .limit(1);
+          
+        if (columnsError) {
+          console.error('Error checking products table:', columnsError);
+        } else if (columnsData && columnsData.length > 0) {
+          console.log('Products table columns:', Object.keys(columnsData[0]));
+        }
+        
         const { data, error: queryError } = await query.order('created_at', { ascending: false });
 
-        if (queryError) throw queryError;
+        if (queryError) {
+          console.error('Supabase query error:', queryError);
+          throw queryError;
+        }
         
+        console.log('Products fetched:', data ? data.length : 0);
         setAllPackages(data || []);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
         console.error("상품 정보 로딩 실패:", errorMessage);
         setError(errorMessage);
+        // 임시: 에러 상황에서도 테스트 데이터 표시
+        setAllPackages([
+          {
+            id: '1',
+            name: '테스트 상품 (API 연결 오류)',
+            price: 1000000,
+            discountRate: 0.1,
+            rating: 4.5,
+            destination: '테스트',
+            image: 'https://via.placeholder.com/300x200',
+            days: 5,
+            type: 'culture',
+            description: '테스트 상품입니다. API 연결을 확인해주세요.',
+            region: 'test',
+            created_at: new Date().toISOString(),
+            category: '추천여행'
+          }
+        ]);
       } finally {
         setIsLoading(false);
       }
