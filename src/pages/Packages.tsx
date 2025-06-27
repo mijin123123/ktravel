@@ -59,7 +59,8 @@ const Packages = () => {
         let categoryFound = false;
 
         if (category) {
-          const parentCategory = menuItems.find(m => m.url === category && m.parent_id === null);
+          // DB에 저장된 url이 '/best' 형태일 수 있으므로, 앞의 '/'를 제거하고 비교합니다.
+          const parentCategory = menuItems.find(m => m.url.replace(/^\//, '') === category && m.parent_id === null);
           
           if (parentCategory) {
             categoryFound = true;
@@ -67,7 +68,8 @@ const Packages = () => {
             
             // 서브 카테고리 처리
             if (subcategory) {
-              const childCategory = menuItems.find(m => m.url === subcategory && m.parent_id === parentCategory.id);
+              // 서브카테고리도 동일하게 처리합니다.
+              const childCategory = menuItems.find(m => m.url.replace(/^\//, '') === subcategory && m.parent_id === parentCategory.id);
               if (childCategory) {
                 query = query.eq('category', childCategory.name);
                 title = `${parentCategory.name} > ${childCategory.name}`;
