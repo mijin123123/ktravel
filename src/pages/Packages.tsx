@@ -103,24 +103,6 @@ const Packages = () => {
         const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
         console.error("상품 정보 로딩 실패:", errorMessage);
         setError(errorMessage);
-        // 임시: 에러 상황에서도 테스트 데이터 표시
-        setAllPackages([
-          {
-            id: '1',
-            name: '테스트 상품 (API 연결 오류)',
-            price: 1000000,
-            discountRate: 0.1,
-            rating: 4.5,
-            destination: '테스트',
-            image: 'https://via.placeholder.com/300x200',
-            days: 5,
-            type: 'culture',
-            description: '테스트 상품입니다. API 연결을 확인해주세요.',
-            region: 'test',
-            created_at: new Date().toISOString(),
-            category: '추천여행'
-          }
-        ]);
       } finally {
         setIsLoading(false);
       }
