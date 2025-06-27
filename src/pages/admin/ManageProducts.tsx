@@ -60,11 +60,15 @@ const ManageProducts = () => {
       setProducts(products.map((p) => (p.id === productToSave.id ? productToSave : p)));
     } else {
       // 추가
-      const newProduct = { ...productToSave, id: `pkg${Date.now()}` }; // 임시 ID 생성
+      const newProduct = { ...productToSave, id: new Date().getTime().toString() }; // 문자열 ID 생성
       setProducts([...products, newProduct]);
     }
     // TODO: 실제 API 연동 시 서버에 저장 요청 보내기
     handleCloseModal();
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('ko-KR').format(price) + '원';
   };
 
   if (isLoading) {
@@ -91,47 +95,59 @@ const ManageProducts = () => {
         <table className="min-w-full leading-normal">
           <thead>
             <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">ID</th>
-              <th className="py-3 px-6 text-left">카테고리</th>
               <th className="py-3 px-6 text-left">상품명</th>
-              <th className="py-3 px-6 text-left">지역</th>
-              <th className="py-3 px-6 text-right">가격</th>
+              <th className="py-3 px-6 text-left">카테고리</th>
+              <th className="py-3 px-6 text-right">원가</th>
+              <th className="py-3 px-6 text-right">할인율</th>
+              <th className="py-3 px-6 text-right font-bold">최종가</th>
               <th className="py-3 px-6 text-center">관리</th>
             </tr>
           </thead>
           <tbody className="text-gray-700">
-            {products.map((product) => (
-              <tr key={product.id} className="border-b border-gray-200 hover:bg-gray-50">
-                <td className="py-3 px-6 text-left whitespace-nowrap">{product.id}</td>
-                <td className="py-3 px-6 text-left">{product.category}</td>
-                <td className="py-3 px-6 text-left">{product.name}</td>
-                <td className="py-3 px-6 text-left">{product.destination}</td>
-                <td className="py-3 px-6 text-right">{product.price.toLocaleString()}원</td>
-                <td className="py-3 px-6 text-center">
-                  <button 
-                    onClick={() => handleEditProduct(product)}
-                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-full text-xs mr-2 transition duration-300"
-                  >
-                    수정
-                  </button>
-                  <button 
-                    onClick={() => handleDeleteProduct(product.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-full text-xs transition duration-300"
-                  >
-                    삭제
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {products.map((product) => {
+              const finalPrice = product.price * (1 - (product.discountRate || 0));
+              return (
+                <tr key={product.id} className="border-b border-gray-200 hover:bg-gray-100">
+                  <td className="py-4 px-6 text-left whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="mr-4">
+                        <img src={product.image} alt={product.name} className="w-16 h-16 rounded-md object-cover" />
+                      </div>
+                      <span className="font-medium">{product.name}</span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-6 text-left">{product.category}</td>
+                  <td className="py-4 px-6 text-right">{formatPrice(product.price)}</td>
+                  <td className="py-4 px-6 text-right text-red-500">{`${((product.discountRate || 0) * 100).toFixed(0)}%`}</td>
+                  <td className="py-4 px-6 text-right font-bold text-blue-600">{formatPrice(finalPrice)}</td>
+                  <td className="py-4 px-6 text-center">
+                    <button
+                      onClick={() => handleEditProduct(product)}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-full text-xs mr-2"
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product.id)}
+                      className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-full text-xs"
+                    >
+                      삭제
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
-      <ProductModal 
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSave={handleSaveProduct}
-        product={selectedProduct}
-      />
+
+      {isModalOpen && (
+        <ProductModal
+          product={selectedProduct}
+          onClose={handleCloseModal}
+          onSave={handleSaveProduct}
+        />
+      )}
     </div>
   );
 };

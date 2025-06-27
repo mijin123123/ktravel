@@ -59,6 +59,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, pr
       region: '',
       image: '',
       price: 0,
+      discountRate: 0, // 할인율 필드 추가
       days: 0,
       description: '',
       rating: 0,
@@ -74,7 +75,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, pr
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    const isNumberField = ['price', 'days', 'rating'].includes(name);
+    const isNumberField = ['price', 'days', 'rating', 'discountRate'].includes(name);
     const processedValue = isNumberField ? parseFloat(value) || 0 : value;
 
     setFormData(prev => ({
@@ -116,7 +117,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, pr
 
                 <input type="text" name="destination" value={formData.destination} onChange={handleChange} placeholder="여행지" className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 <input type="text" name="region" value={formData.region} onChange={handleChange} placeholder="지역" className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-                <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="가격" className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="총금액(원가)" className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                <input type="number" name="discountRate" value={formData.discountRate || ''} onChange={handleChange} placeholder="할인율(%)" className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 <input type="number" name="days" value={formData.days} onChange={handleChange} placeholder="여행 기간 (일)" className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 <input type="number" step="0.1" name="rating" value={formData.rating} onChange={handleChange} placeholder="평점" className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 <input type="text" name="type" value={formData.type} onChange={handleChange} placeholder="타입 (예: 신혼 여행)" className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />

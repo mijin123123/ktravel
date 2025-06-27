@@ -7,6 +7,7 @@ export interface TravelPackage {
   region: string;
   image: string;
   price: number;
+  discountRate: number; // 할인율 (예: 0.1은 10% 할인)
   days: number;
   description: string;
   rating: number;
