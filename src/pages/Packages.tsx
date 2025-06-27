@@ -1,135 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-// 여행 패키지 타입 정의
-interface Package {
-  id: string;
-  name: string;
-  destination: string;
-  region: string;
-  image: string;
-  price: number;
-  days: number;
-  description: string;
-  rating: number;
-  type: string;
-}
+import { TravelPackage } from '../types'; // 타입 임포트
+import { supabase } from '../lib/supabaseClient'; // Supabase 클라이언트 임포트
 
 const Packages = () => {
-  // 필터 상태
+  // 상태 변수들
   const [filters, setFilters] = useState({
     region: '',
     priceRange: '',
     days: '',
     type: ''
   });
-  
-  // 정렬 상태
   const [sortBy, setSortBy] = useState('recommended');
-  
-  // 패키지 데이터 (실제로는 API에서 가져올 데이터)
-  const [packages, _setPackages] = useState<Package[]>([
-    {
-      id: '1',
-      name: '로마, 피렌체, 베니스를 아우르는 이탈리아 핵심 투어',
-      destination: '이탈리아',
-      region: 'europe',
-      image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80',
-      price: 1290000,
-      days: 7,
-      description: '영원한 도시 로마에서의 특별한 여행. 콜로세움, 바티칸, 트레비 분수 등 고대 유적 탐험과 함께 피렌체의 예술, 베니스의 운하를 모두 경험하세요.',
-      rating: 4.8,
-      type: 'culture'
-    },
-    {
-      id: '2',
-      name: '도쿄 시티 투어 - 현대와 전통이 공존하는 일본의 수도',
-      destination: '일본',
-      region: 'asia',
-      image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHRva3lvfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
-      price: 980000,
-      days: 5,
-      description: '전통과 현대가 공존하는 도쿄. 신주쿠, 시부야, 아사쿠사 등 일본 문화 체험.',
-      rating: 4.9,
-      type: 'city'
-    },
-    {
-      id: '3',
-      name: '파리 & 프로방스 로맨틱 여행',
-      destination: '프랑스',
-      region: 'europe',
-      image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-1.2.1&auto=format&fit=crop&w=1952&q=80',
-      price: 1490000,
-      days: 6,
-      description: '낭만의 도시 파리에서의 환상적인 여행. 에펠탑, 루브르 박물관, 개선문, 노트르담 대성당 관광과 함께 프로방스의 라벤더 밭을 경험하세요.',
-      rating: 4.7,
-      type: 'romantic'
-    },
-    {
-      id: '4',
-      name: '발리 허니문 특별 패키지',
-      destination: '인도네시아',
-      region: 'asia',
-      image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1938&q=80',
-      price: 890000,
-      days: 5,
-      description: '신들의 섬 발리에서 즐기는 완벽한 허니문. 아름다운 해변과 우붓의 계단식 논 탐방, 프라이빗 풀빌라 숙박 포함.',
-      rating: 4.9,
-      type: 'honeymoon'
-    },
-    {
-      id: '5',
-      name: '시드니 & 골드코스트 오스트레일리아 핵심 투어',
-      destination: '호주',
-      region: 'oceania',
-      image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80',
-      price: 1690000,
-      days: 8,
-      description: '시드니의 오페라 하우스, 하버 브릿지부터 골드코스트의 아름다운 해변까지 호주의 핵심 명소를 모두 경험하세요.',
-      rating: 4.6,
-      type: 'sightseeing'
-    },
-    {
-      id: '6',
-      name: '뉴욕 & 워싱턴 D.C. 미동부 핵심 투어',
-      destination: '미국',
-      region: 'america',
-      image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80',
-      price: 1790000,
-      days: 7,
-      description: '세계의 수도 뉴욕에서 자유의 여신상, 타임스퀘어, 브로드웨이를 경험하고 미국의 수도 워싱턴 D.C.에서 백악관과 국회의사당을 방문하세요.',
-      rating: 4.5,
-      type: 'city'
-    },
-    {
-      id: '7',
-      name: '방콕 & 푸켓 태국 여행',
-      destination: '태국',
-      region: 'asia',
-      image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80',
-      price: 750000,
-      days: 6,
-      description: '활기찬 방콕의 사원과 시장을 탐험하고, 푸켓의 에메랄드 해변에서 휴양을 즐기세요.',
-      rating: 4.7,
-      type: 'beach'
-    },
-    {
-      id: '8',
-      name: '바르셀로나 & 마드리드 스페인 문화 탐방',
-      destination: '스페인',
-      region: 'europe',
-      image: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80',
-      price: 1250000,
-      days: 7,
-      description: '가우디의 도시 바르셀로나와 왕족의 도시 마드리드를 아우르는 스페인 문화 탐방 여행입니다.',
-      rating: 4.8,
-      type: 'culture'
-    }
-  ]);
-  
-  // 필터링된 패키지
-  const [filteredPackages, setFilteredPackages] = useState<Package[]>([]);
-  
+  const [packages, setPackages] = useState<TravelPackage[]>([]);
+  const [filteredPackages, setFilteredPackages] = useState<TravelPackage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   // 가격 범위 옵션
   const priceRanges = [
     { value: '', label: '모든 가격대' },
@@ -167,59 +54,79 @@ const Packages = () => {
     { value: 'america', label: '미주/중남미' },
   ];
   
+  // 데이터 로딩 로직
+  useEffect(() => {
+    const fetchPackages = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*');
+
+        if (error) {
+          throw error;
+        }
+        setPackages(data || []);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
+        console.error("상품 정보 로딩 실패:", errorMessage);
+        setError(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPackages();
+  }, []);
+
   // 필터 변경 핸들러
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFilters({
-      ...filters,
-      [name]: value,
-    });
+    setFilters(prev => ({ ...prev, [name]: value }));
   };
-  
+
   // 정렬 변경 핸들러
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(e.target.value);
   };
-  
+
   // 필터링 및 정렬 로직
   useEffect(() => {
     let result = [...packages];
-    
-    // 지역 필터링
+
     if (filters.region) {
-      result = result.filter(pkg => pkg.region === filters.region);
+        // 참고: 현재 products 테이블에는 region 필드가 없습니다. destination으로 대체합니다.
+        result = result.filter(pkg => pkg.destination.toLowerCase().includes(filters.region));
     }
-    
-    // 가격 범위 필터링
+
     if (filters.priceRange) {
       const [min, max] = filters.priceRange.split('-').map(Number);
       result = result.filter(pkg => {
-        if (!max) return pkg.price >= min;
-        return pkg.price >= min && pkg.price <= max;
+        const finalPrice = pkg.price * (1 - (pkg.discountRate || 0));
+        if (isNaN(max)) return finalPrice >= min;
+        return finalPrice >= min && finalPrice <= max;
       });
     }
-    
-    // 일수 필터링
+
     if (filters.days) {
       const [min, max] = filters.days.split('-').map(Number);
       result = result.filter(pkg => {
-        if (!max) return pkg.days >= min;
+        if (isNaN(max)) return pkg.days >= min;
         return pkg.days >= min && pkg.days <= max;
       });
     }
-    
-    // 유형 필터링
+
     if (filters.type) {
-      result = result.filter(pkg => pkg.type === filters.type);
+      result = result.filter(pkg => pkg.category === filters.type);
     }
-    
-    // 정렬
+
     switch (sortBy) {
       case 'price-low':
-        result.sort((a, b) => a.price - b.price);
+        result.sort((a, b) => (a.price * (1 - (a.discountRate || 0))) - (b.price * (1 - (b.discountRate || 0))));
         break;
       case 'price-high':
-        result.sort((a, b) => b.price - a.price);
+        result.sort((a, b) => (b.price * (1 - (b.discountRate || 0))) - (a.price * (1 - (a.discountRate || 0))));
         break;
       case 'duration-short':
         result.sort((a, b) => a.days - b.days);
@@ -232,17 +139,25 @@ const Packages = () => {
         break;
       case 'recommended':
       default:
-        // 기본 정렬은 추천 순(여기서는 임의로 설정)
+        // 기본 정렬 (현재는 추가 로직 없음)
         break;
     }
-    
+
     setFilteredPackages(result);
   }, [filters, sortBy, packages]);
-  
+
   // 가격 포맷팅 함수
   const formatPrice = (price: number) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return new Intl.NumberFormat('ko-KR').format(price);
   };
+
+  if (isLoading) {
+    return <div className="container-custom py-8 text-center">로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div className="container-custom py-8 text-center text-red-500">에러: {error}</div>;
+  }
 
   return (
     <div className="bg-gray-50 py-8">
@@ -342,7 +257,9 @@ const Packages = () => {
         
         {/* 패키지 목록 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPackages.map(pkg => (
+          {filteredPackages.map(pkg => {
+            const finalPrice = pkg.price * (1 - (pkg.discountRate || 0));
+            return (
             <div key={pkg.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
               <Link to={`/packages/${pkg.id}`}>
                 <div className="relative h-56">
@@ -353,7 +270,7 @@ const Packages = () => {
                   />
                   {/* 지역 뱃지 */}
                   <div className="absolute top-4 left-4 bg-primary-600 text-white text-xs font-bold px-2 py-1 rounded">
-                    {regions.find(r => r.value === pkg.region)?.label}
+                    {pkg.destination}
                   </div>
                 </div>
                 <div className="p-6">
@@ -375,18 +292,24 @@ const Packages = () => {
                   </div>
                   <div className="mt-4 pt-4 border-t border-gray-100">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500">1인 기준</span>
-                      <span className="font-bold text-lg text-primary-600">{formatPrice(pkg.price)}원~</span>
+                      <div>
+                        {(pkg.discountRate || 0) > 0 && (
+                          <span className="text-sm text-gray-400 line-through mr-2">{formatPrice(pkg.price)}원</span>
+                        )}
+                        <span className="text-sm text-gray-500">1인 기준</span>
+                      </div>
+                      <span className="font-bold text-lg text-primary-600">{formatPrice(finalPrice)}원~</span>
                     </div>
                   </div>
                 </div>
               </Link>
             </div>
-          ))}
+            )
+          })}
         </div>
         
         {/* 패키지가 없을 경우 */}
-        {filteredPackages.length === 0 && (
+        {filteredPackages.length === 0 && !isLoading && (
           <div className="text-center py-12">
             <h3 className="text-xl font-bold mb-2">검색 결과가 없습니다</h3>
             <p className="text-gray-600 mb-6">다른 검색 조건을 시도해보세요.</p>

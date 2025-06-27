@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { User } from '../../types';
 import UserModal from '../../components/admin/UserModal';
+import { supabase } from '../../lib/supabaseClient';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -9,28 +10,31 @@ const ManageUsers = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch('/users.json');
-        if (!response.ok) {
-          throw new Error('회원 정보를 불러오는데 실패했습니다.');
-        }
-        const data = await response.json();
-        setUsers(data);
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('알 수 없는 오류가 발생했습니다.');
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchUsers = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    fetchUsers();
+      if (error) {
+        throw error;
+      }
+      setUsers(data || []);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
+      console.error("회원 정보 로딩 실패:", errorMessage);
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleAddNewUser = () => {
     setSelectedUser(null);
@@ -42,10 +46,22 @@ const ManageUsers = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteUser = (userId: string) => {
-    if (window.confirm('정말로 이 회원을 삭제하시겠습니까?')) {
-      setUsers(users.filter((u) => u.id !== userId));
-      // TODO: 실제 API 연동 시 서버에 삭제 요청 보내기
+  const handleDeleteUser = async (userId: string) => {
+    if (window.confirm('정말로 이 회원을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+      try {
+        const { error } = await supabase
+          .from('users')
+          .delete()
+          .eq('id', userId);
+
+        if (error) throw error;
+
+        setUsers(users.filter((u) => u.id !== userId));
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : '회원 삭제 중 오류가 발생했습니다.';
+        console.error(errorMessage);
+        alert(errorMessage);
+      }
     }
   };
 
@@ -54,17 +70,40 @@ const ManageUsers = () => {
     setSelectedUser(null);
   };
 
-  const handleSaveUser = (userToSave: User) => {
-    if (selectedUser) {
-      // 수정
-      setUsers(users.map((u) => (u.id === userToSave.id ? userToSave : u)));
-    } else {
-      // 추가
-      const newUser = { ...userToSave, id: `user${Date.now()}` }; // 임시 ID 생성
-      setUsers([...users, newUser]);
+  const handleSaveUser = async (userToSave: Omit<User, 'id' | 'created_at'> & { id?: string }) => {
+    try {
+      if (selectedUser && userToSave.id) {
+        // 수정
+        const { id, ...updateData } = userToSave;
+        const { data, error } = await supabase
+          .from('users')
+          .update(updateData)
+          .eq('id', id)
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        setUsers(users.map((u) => (u.id === data.id ? data : u)));
+      } else {
+        // 추가
+        const { id, ...insertData } = userToSave;
+        const { data, error } = await supabase
+          .from('users')
+          .insert([insertData])
+          .select()
+          .single();
+        
+        if (error) throw error;
+
+        setUsers([data, ...users]);
+      }
+      handleCloseModal();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '회원 정보 저장 중 오류가 발생했습니다.';
+      console.error(errorMessage);
+      alert(errorMessage);
     }
-    // TODO: 실제 API 연동 시 서버에 저장 요청 보내기
-    handleCloseModal();
   };
 
   if (isLoading) {
@@ -91,18 +130,17 @@ const ManageUsers = () => {
         <table className="min-w-full leading-normal">
           <thead>
             <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">ID</th>
               <th className="py-3 px-6 text-left">이름</th>
               <th className="py-3 px-6 text-left">이메일</th>
               <th className="py-3 px-6 text-left">연락처</th>
               <th className="py-3 px-6 text-center">역할</th>
+              <th className="py-3 px-6 text-left">가입일</th>
               <th className="py-3 px-6 text-center">관리</th>
             </tr>
           </thead>
           <tbody className="text-gray-700">
             {users.map((user) => (
               <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
-                <td className="py-3 px-6 text-left whitespace-nowrap">{user.id}</td>
                 <td className="py-3 px-6 text-left">{user.name}</td>
                 <td className="py-3 px-6 text-left">{user.email}</td>
                 <td className="py-3 px-6 text-left">{user.phone}</td>
@@ -111,6 +149,7 @@ const ManageUsers = () => {
                     {user.role}
                   </span>
                 </td>
+                <td className="py-3 px-6 text-left">{new Date(user.created_at).toLocaleDateString()}</td>
                 <td className="py-3 px-6 text-center">
                   <button 
                     onClick={() => handleEditUser(user)}

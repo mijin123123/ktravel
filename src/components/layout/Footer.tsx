@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabaseClient'; // Supabase 클라이언트 import
 import { FooterContent, FooterLink, SocialLink } from '../../types';
 
 const Footer = () => {
@@ -7,10 +8,21 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   useEffect(() => {
-    fetch('/footer.json')
-      .then(res => res.json())
-      .then(data => setFooterContent(data))
-      .catch(error => console.error("Failed to fetch footer content:", error));
+    const fetchFooterContent = async () => {
+      const { data, error } = await supabase
+        .from('footer_content')
+        .select('content')
+        .eq('id', 1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error("Failed to fetch footer content:", error);
+      } else if (data) {
+        setFooterContent(data.content as FooterContent);
+      }
+    };
+
+    fetchFooterContent();
   }, []);
 
   if (!footerContent) {

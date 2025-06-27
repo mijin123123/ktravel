@@ -49,28 +49,39 @@ export interface User {
   email: string;
   phone?: string;
   role: 'user' | 'admin';
+  created_at: string; // Supabase에서 자동 생성되는 필드
 }
 
-// 예약 상태 타입
+// 예약 상태 타입 (canceled 오타 수정)
 export type BookingStatus = 'pending' | 'confirmed' | 'canceled' | 'completed';
 
-// 예약 타입
+// 예약 타입 (Supabase 스키마에 맞게 재정의)
 export interface Booking {
-  id: number;
-  userName: string;
-  packageName: string;
-  bookingDate: string;
-  status: 'confirmed' | 'pending' | 'cancelled';
-  totalPrice: number;
+  id: string;
+  package_id: string;
+  user_id: string;
+  departure_date: string;
+  total_price: number;
+  status: BookingStatus;
+  created_at: string;
+  // 테이블 조인을 통해 가져올 데이터 타입
+  products?: {
+    name: string;
+  };
+  users?: {
+    name: string;
+    email: string;
+  };
 }
 
-// 계좌 타입
+// 계좌 타입 (Supabase 스키마에 맞게 재정의)
 export interface Account {
-  id: string;
-  bankName: string;
-  accountNumber: string;
-  accountHolder: string;
-  isDefault: boolean;
+  id: string; // uuid
+  bank_name: string;
+  account_number: string;
+  account_holder: string;
+  is_default: boolean;
+  created_at?: string;
 }
 
 // 푸터 컨텐츠 타입
@@ -89,11 +100,13 @@ export interface CustomerCenter {
   info: string[];
 }
 
+// 소셜 링크 타입
 export interface SocialLink {
   name: string;
   url: string;
 }
 
+// 전체 푸터 컨텐츠 타입 (Supabase 'content' JSON 필드 구조)
 export interface FooterContent {
   description: string;
   packages: FooterSection;
@@ -108,8 +121,10 @@ export interface SubCategory {
 }
 
 export interface MenuCategory {
+  id: number;
   name: string;
   url: string;
-  order: string;
-  sub?: SubCategory[];
+  order: number;
+  parent_id: number | null;
+  sub?: MenuCategory[]; // 가공 후 서브메뉴를 담을 속성
 }

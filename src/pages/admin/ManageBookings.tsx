@@ -1,37 +1,61 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Booking, BookingStatus } from '../../types';
+import { supabase } from '../../lib/supabaseClient';
 
 const ManageBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const response = await fetch('/bookings.json');
-        if (!response.ok) {
-          throw new Error('예약 정보를 불러오는데 실패했습니다.');
-        }
-        const data = await response.json();
-        setBookings(data);
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('알 수 없는 오류가 발생했습니다.');
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchBookings = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // products와 users 테이블에서 필요한 정보를 함께 가져옵니다.
+      const { data, error } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          products ( name ),
+          users ( name, email )
+        `)
+        .order('created_at', { ascending: false });
 
-    fetchBookings();
+      if (error) {
+        throw error;
+      }
+      setBookings(data || []);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
+      console.error("예약 정보 로딩 실패:", errorMessage);
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const handleStatusChange = (bookingId: string, newStatus: BookingStatus) => {
-    setBookings(bookings.map(b => b.id === bookingId ? { ...b, status: newStatus } : b));
-    // TODO: 실제 API 연동 시 서버에 상태 변경 요청 보내기
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
+
+  const handleStatusChange = async (bookingId: string, newStatus: BookingStatus) => {
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .update({ status: newStatus })
+        .eq('id', bookingId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // 로컬 상태 업데이트
+      setBookings(bookings.map(b => b.id === bookingId ? { ...b, status: newStatus } : b));
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '예약 상태 변경 중 오류가 발생했습니다.';
+      console.error(errorMessage);
+      alert(errorMessage);
+    }
   };
 
   const getStatusBadgeColor = (status: BookingStatus) => {
@@ -60,23 +84,27 @@ const ManageBookings = () => {
         <table className="min-w-full leading-normal">
           <thead>
             <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">예약 ID</th>
-              <th className="py-3 px-6 text-left">상품 ID</th>
-              <th className="py-3 px-6 text-left">사용자 ID</th>
+              <th className="py-3 px-6 text-left">예약상품</th>
+              <th className="py-3 px-6 text-left">예약자 정보</th>
               <th className="py-3 px-6 text-left">출발일</th>
               <th className="py-3 px-6 text-right">총 가격</th>
               <th className="py-3 px-6 text-center">예약 상태</th>
-              <th className="py-3 px-6 text-center">관리</th>
+              <th className="py-3 px-6 text-center">상태 변경</th>
             </tr>
           </thead>
           <tbody className="text-gray-700">
             {bookings.map((booking) => (
               <tr key={booking.id} className="border-b border-gray-200 hover:bg-gray-50">
-                <td className="py-3 px-6 text-left whitespace-nowrap font-mono text-xs">{booking.id}</td>
-                <td className="py-3 px-6 text-left whitespace-nowrap font-mono text-xs">{booking.packageId}</td>
-                <td className="py-3 px-6 text-left whitespace-nowrap font-mono text-xs">{booking.userId}</td>
-                <td className="py-3 px-6 text-left">{booking.departureDate}</td>
-                <td className="py-3 px-6 text-right">{booking.totalPrice.toLocaleString()}원</td>
+                <td className="py-3 px-6 text-left">
+                  <div className="font-bold">{booking.products?.name || '(알 수 없음)'}</div>
+                  <div className="text-xs text-gray-500 font-mono">ID: {booking.package_id}</div>
+                </td>
+                <td className="py-3 px-6 text-left">
+                  <div>{booking.users?.name || '(알 수 없음)'}</div>
+                  <div className="text-xs text-gray-500">{booking.users?.email}</div>
+                </td>
+                <td className="py-3 px-6 text-left">{new Date(booking.departure_date).toLocaleDateString()}</td>
+                <td className="py-3 px-6 text-right">{booking.total_price.toLocaleString()}원</td>
                 <td className="py-3 px-6 text-center">
                   <span className={`px-2 py-1 font-semibold leading-tight text-xs rounded-full ${getStatusBadgeColor(booking.status)}`}>
                     {booking.status}

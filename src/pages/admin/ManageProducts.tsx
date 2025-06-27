@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { TravelPackage } from '../../types';
 import ProductModal from '../../components/admin/ProductModal';
+import { supabase } from '../../lib/supabaseClient'; // supabase 클라이언트 임포트
 
 const ManageProducts = () => {
   const [products, setProducts] = useState<TravelPackage[]>([]);
@@ -9,46 +10,58 @@ const ManageProducts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<TravelPackage | null>(null);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch('/products.json');
-        if (!response.ok) {
-          throw new Error('상품 정보를 불러오는데 실패했습니다.');
-        }
-        const data = await response.json();
-        setProducts(data);
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('알 수 없는 오류가 발생했습니다.');
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchProducts = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('name', { ascending: true });
 
-    fetchProducts();
+      if (error) {
+        throw error;
+      }
+      setProducts(data || []);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
+      console.error("상품 정보 로딩 실패:", errorMessage);
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
   const handleAddNewProduct = () => {
-    console.log('새 상품 추가 버튼 클릭');
-    setSelectedProduct(null); // 새 상품이므로 null
+    setSelectedProduct(null);
     setIsModalOpen(true);
   };
 
   const handleEditProduct = (product: TravelPackage) => {
-    console.log(`수정 버튼 클릭: ${product.id}`);
     setSelectedProduct(product);
     setIsModalOpen(true);
   };
 
-  const handleDeleteProduct = (productId: string) => {
-    console.log(`삭제 버튼 클릭: ${productId}`);
+  const handleDeleteProduct = async (productId: string) => {
     if (window.confirm('정말로 이 상품을 삭제하시겠습니까?')) {
-      setProducts(products.filter((p) => p.id !== productId));
-      // TODO: 실제 API 연동 시 서버에 삭제 요청 보내기
+      try {
+        const { error } = await supabase
+          .from('products')
+          .delete()
+          .eq('id', productId);
+
+        if (error) throw error;
+
+        // UI에서 즉시 삭제된 항목 제거
+        setProducts(products.filter((p) => p.id !== productId));
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : '상품 삭제 중 오류가 발생했습니다.';
+        console.error(errorMessage);
+        alert(errorMessage);
+      }
     }
   };
 
@@ -57,17 +70,42 @@ const ManageProducts = () => {
     setSelectedProduct(null);
   };
 
-  const handleSaveProduct = (productToSave: TravelPackage) => {
-    if (selectedProduct) {
-      // 수정
-      setProducts(products.map((p) => (p.id === productToSave.id ? productToSave : p)));
-    } else {
-      // 추가
-      const newProduct = { ...productToSave, id: new Date().getTime().toString() }; // 문자열 ID 생성
-      setProducts([...products, newProduct]);
+  const handleSaveProduct = async (productToSave: Omit<TravelPackage, 'id'> & { id?: string }) => {
+    try {
+      // productToSave에서 id를 명시적으로 분리하고, 나머지 데이터만 productData로 사용합니다.
+      const { id, ...productData } = productToSave;
+
+      if (selectedProduct && selectedProduct.id) {
+        // 수정 모드: selectedProduct.id를 사용하여 업데이트합니다.
+        const { data, error } = await supabase
+          .from('products')
+          .update(productData) // id가 없는 순수 데이터를 업데이트합니다.
+          .eq('id', selectedProduct.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+        
+        setProducts(products.map((p) => (p.id === data.id ? data : p)));
+
+      } else {
+        // 추가 모드: id를 제외한 productData를 삽입합니다.
+        const { data, error } = await supabase
+          .from('products')
+          .insert([productData]) 
+          .select()
+          .single();
+        
+        if (error) throw error;
+
+        setProducts([...products, data]);
+      }
+      handleCloseModal();
+    } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : '상품 저장 중 오류가 발생했습니다.';
+        console.error(errorMessage);
+        alert(errorMessage);
     }
-    // TODO: 실제 API 연동 시 서버에 저장 요청 보내기
-    handleCloseModal();
   };
 
   const formatPrice = (price: number) => {
