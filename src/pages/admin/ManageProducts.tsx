@@ -33,16 +33,19 @@ const ManageProducts = () => {
   }, []);
 
   const handleAddNewProduct = () => {
+    console.log('새 상품 추가 버튼 클릭');
     setSelectedProduct(null); // 새 상품이므로 null
     setIsModalOpen(true);
   };
 
   const handleEditProduct = (product: TravelPackage) => {
+    console.log(`수정 버튼 클릭: ${product.id}`);
     setSelectedProduct(product);
     setIsModalOpen(true);
   };
 
   const handleDeleteProduct = (productId: string) => {
+    console.log(`삭제 버튼 클릭: ${productId}`);
     if (window.confirm('정말로 이 상품을 삭제하시겠습니까?')) {
       setProducts(products.filter((p) => p.id !== productId));
       // TODO: 실제 API 연동 시 서버에 삭제 요청 보내기
