@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { TravelPackage } from '../../types';
 
+// menu.json의 구조에 맞는 타입 정의
+interface MenuCategory {
+  name: string;
+  sub?: { name: string }[];
+}
+
 interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -9,9 +15,45 @@ interface ProductModalProps {
 }
 
 const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, product }) => {
+  const [categories, setCategories] = useState<string[]>([]);
+
+  // menu.json에서 카테고리 목록을 불러옵니다.
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/menu.json');
+        if (!response.ok) {
+          throw new Error('카테고리 정보를 불러오는데 실패했습니다.');
+        }
+        const menuData: MenuCategory[] = await response.json();
+        const allCategories: string[] = [];
+        menuData.forEach(mainCat => {
+          // 메인 카테고리 추가
+          allCategories.push(mainCat.name);
+          // 서브 카테고리가 있으면 "메인 > 서브" 형태로 추가
+          if (mainCat.sub) {
+            mainCat.sub.forEach(subCat => {
+              allCategories.push(`${mainCat.name} > ${subCat.name}`);
+            });
+          }
+        });
+        setCategories(allCategories);
+      } catch (error) {
+        console.error(error);
+        // 실패 시 기본 카테고리 목록
+        setCategories(["베스트", "패키지", "항공/호텔"]);
+      }
+    };
+
+    if (isOpen) {
+      fetchCategories();
+    }
+  }, [isOpen]);
+
   const getInitialFormData = (): TravelPackage => {
     return product || {
-      id: '', // 새 상품의 ID는 저장 시점에 생성됩니다.
+      id: '',
+      category: '', // 카테고리 필드 추가
       name: '',
       destination: '',
       region: '',
@@ -30,7 +72,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, pr
     setFormData(getInitialFormData());
   }, [isOpen, product]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     const isNumberField = ['price', 'days', 'rating'].includes(name);
     const processedValue = isNumberField ? parseFloat(value) || 0 : value;
@@ -57,6 +99,21 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, pr
         <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                 <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="상품명" className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                
+                {/* 카테고리 선택 드롭다운 */}
+                <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                >
+                    <option value="" disabled>카테고리 선택</option>
+                    {categories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                </select>
+
                 <input type="text" name="destination" value={formData.destination} onChange={handleChange} placeholder="여행지" className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 <input type="text" name="region" value={formData.region} onChange={handleChange} placeholder="지역" className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="가격" className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />

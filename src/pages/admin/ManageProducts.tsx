@@ -92,6 +92,7 @@ const ManageProducts = () => {
           <thead>
             <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
               <th className="py-3 px-6 text-left">ID</th>
+              <th className="py-3 px-6 text-left">카테고리</th>
               <th className="py-3 px-6 text-left">상품명</th>
               <th className="py-3 px-6 text-left">지역</th>
               <th className="py-3 px-6 text-right">가격</th>
@@ -102,6 +103,7 @@ const ManageProducts = () => {
             {products.map((product) => (
               <tr key={product.id} className="border-b border-gray-200 hover:bg-gray-50">
                 <td className="py-3 px-6 text-left whitespace-nowrap">{product.id}</td>
+                <td className="py-3 px-6 text-left">{product.category}</td>
                 <td className="py-3 px-6 text-left">{product.name}</td>
                 <td className="py-3 px-6 text-left">{product.destination}</td>
                 <td className="py-3 px-6 text-right">{product.price.toLocaleString()}원</td>

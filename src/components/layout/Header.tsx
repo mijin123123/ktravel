@@ -1,18 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-
-// 메뉴 데이터 타입을 정의합니다.
-interface SubCategory {
-  name: string;
-  order: string;
-}
-
-interface MenuCategory {
-  name: string;
-  url: string;
-  order: string;
-  sub?: SubCategory[];
-}
+import { MenuCategory } from '../../types'; // 타입 가져오기
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,47 +10,22 @@ const Header = () => {
   useEffect(() => {
     const fetchMenuData = async () => {
       try {
-        // 캐시를 방지하기 위해 타임스탬프를 추가합니다.
         const response = await fetch(`/menu.json?t=${new Date().getTime()}`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const data: MenuCategory[] = await response.json();
-        
-        // 데이터 유효성을 검사하고 URL을 React Router에 맞게 변환합니다.
-        const validatedData = data.map((item) => {
-            let newUrl = item.url.replace(/\.html$/, ''); // .html 확장자 제거
-            if (newUrl === 'index') {
-                newUrl = ''; // index는 루트 경로로 매핑
-            }
-            return {
-                ...item,
-                url: `/${newUrl}`,
-                sub: item.sub || [],
-            };
-        });
-        
-        setMenuData(validatedData);
+        setMenuData(data);
       } catch (error) {
-        console.error("Failed to fetch or parse menu.json:", error);
-        // 에러 발생 시 기본 메뉴 데이터를 사용합니다.
-        setMenuData(getDefaultMenu());
+        console.error("Failed to fetch menu.json:", error);
+        // 에러 발생 시 빈 배열로 설정
+        setMenuData([]);
       }
     };
 
     fetchMenuData();
   }, []);
 
-  const getDefaultMenu = (): MenuCategory[] => {
-    return [
-      { name: '홈', url: '/', order: '1' },
-      { name: '해외여행', url: '/packages', order: '2' },
-      { name: '호텔', url: '/hotels', order: '3' },
-      { name: '회사소개', url: '/about', order: '4' },
-      { name: '문의하기', url: '/contact', order: '5' },
-    ];
-  };
-  
   const isActive = (path: string) => location.pathname === path;
 
   return (

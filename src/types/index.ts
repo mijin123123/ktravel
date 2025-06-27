@@ -1,6 +1,7 @@
 // 여행 패키지 타입
 export interface TravelPackage {
   id: string;
+  category: string; // 카테고리 정보 추가
   name: string;
   destination: string;
   region: string;
@@ -54,16 +55,12 @@ export type BookingStatus = 'pending' | 'confirmed' | 'canceled' | 'completed';
 
 // 예약 타입
 export interface Booking {
-  id: string;
-  packageId: string;
-  userId: string;
-  departureDate: string;
-  returnDate: string;
-  travelers: number;
+  id: number;
+  userName: string;
+  packageName: string;
+  bookingDate: string;
+  status: 'confirmed' | 'pending' | 'cancelled';
   totalPrice: number;
-  status: BookingStatus;
-  createdAt: string;
-  paymentStatus: 'pending' | 'partial' | 'complete';
 }
 
 // 계좌 타입
@@ -102,4 +99,16 @@ export interface FooterContent {
   company: FooterSection;
   customerCenter: CustomerCenter;
   social: SocialLink[];
+}
+
+export interface SubCategory {
+  name: string;
+  order: string;
+}
+
+export interface MenuCategory {
+  name: string;
+  url: string;
+  order: string;
+  sub?: SubCategory[];
 }
