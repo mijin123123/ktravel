@@ -427,12 +427,18 @@ const PackageDetail = () => {
                 </div>
               </div>
               
-              <button
-                className="w-full mt-6 btn btn-primary py-3 text-base"
-                disabled={!selectedDate}
+              <Link
+                to={`/booking?packageId=${id}&date=${selectedDate}&travelers=${travelers}`}
+                className={`w-full mt-6 btn btn-primary py-3 text-base ${!selectedDate ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={e => {
+                  if (!selectedDate) {
+                    e.preventDefault();
+                    alert('출발일을 선택해주세요.');
+                  }
+                }}
               >
                 예약하기
-              </button>
+              </Link>
               
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-500">예약금 20% 선결제, 잔금은 출발 1개월 전 결제</p>
