@@ -8,12 +8,6 @@ import { supabase } from '../lib/supabaseClient';
 const Packages = () => {
   const { category, subcategory } = useParams<{ category: string; subcategory?: string }>();
 
-  const [filters, setFilters] = useState({
-    region: '',
-    priceRange: '',
-    days: '',
-    type: '',
-  });
   const [sortBy, setSortBy] = useState('recommended');
   const [allPackages, setAllPackages] = useState<TravelPackage[]>([]);
   const [filteredPackages, setFilteredPackages] = useState<TravelPackage[]>([]);
@@ -121,40 +115,9 @@ const Packages = () => {
 
   }, [category, subcategory, menuItems]);
 
-  // Apply user filters and sorting
+  // Apply user sorting
   useEffect(() => {
     let result: TravelPackage[] = [...allPackages];
-
-    if (filters.region) {
-      result = result.filter((pkg) => pkg.destination.toLowerCase().includes(filters.region.toLowerCase()));
-    }
-    if (filters.priceRange) {
-      const [minStr, maxStr] = filters.priceRange.split('-');
-      const min = Number(minStr);
-      const max = maxStr && maxStr !== '' ? Number(maxStr) : null;
-      result = result.filter((pkg) => {
-        const finalPrice = pkg.price * (1 - pkg.discountRate);
-        if (max) {
-          return finalPrice >= min && finalPrice <= max;
-        }
-        return finalPrice >= min;
-      });
-    }
-    if (filters.days) {
-        const [minStr, maxStr] = filters.days.split('-');
-        const min = Number(minStr);
-        const max = maxStr && maxStr !== '' ? Number(maxStr) : null;
-        result = result.filter((pkg) => {
-          if (max) {
-            return pkg.days >= min && pkg.days <= max;
-          }
-          return pkg.days >= min;
-        });
-      }
-  
-      if (filters.type) {
-        result = result.filter((pkg) => pkg.type === filters.type);
-      }
 
     if (sortBy === 'priceLow') {
       result.sort((a, b) => (a.price * (1 - a.discountRate)) - (b.price * (1 - b.discountRate)));
@@ -165,41 +128,12 @@ const Packages = () => {
     }
 
     setFilteredPackages(result);
-  }, [filters, sortBy, allPackages]);
+  }, [sortBy, allPackages]);
 
-
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(e.target.value);
   };
-
-  const priceRanges = [
-    { value: '', label: '모든 가격대' },
-    { value: '0-1000000', label: '100만원 이하' },
-    { value: '1000000-1500000', label: '100만원 - 150만원' },
-    { value: '1500000-2000000', label: '150만원 - 200만원' },
-    { value: '2000000-', label: '200만원 이상' },
-  ];
-
-  const dayRanges = [
-    { value: '', label: '모든 일정' },
-    { value: '1-3', label: '3일 이하' },
-    { value: '4-5', label: '4-5일' },
-    { value: '6-7', label: '6-7일' },
-    { value: '8-', label: '8일 이상' },
-  ];
-
-  const packageTypes = [
-    { value: '', label: '모든 타입' },
-    { value: '패키지', label: '패키지' },
-    { value: '허니문', label: '허니문' },
-    { value: '골프', label: '골프' },
-    { value: '크루즈', label: '크루즈' },
-  ];
 
   if (isLoading) {
     return <div className="container mx-auto px-4 py-8">페이지 로딩 중...</div>;
@@ -213,32 +147,14 @@ const Packages = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-4">{pageTitle}</h1>
       
-      {/* Filter and Sort Controls */}
-      <div className="bg-gray-100 p-4 rounded-lg mb-8 flex flex-wrap items-center gap-4">
-        <select name="region" value={filters.region} onChange={handleFilterChange} className="p-2 border rounded">
-          <option value="">모든 지역</option>
-          {/* TODO: 지역 목록 동적 생성 */}
-          <option value="일본">일본</option>
-          <option value="동남아">동남아</option>
-          <option value="유럽">유럽</option>
+      {/* Sort Controls */}
+      <div className="bg-gray-100 p-4 rounded-lg mb-8 flex justify-end">
+        <select value={sortBy} onChange={handleSortChange} className="p-2 border rounded">
+          <option value="recommended">추천순</option>
+          <option value="priceLow">가격 낮은순</option>
+          <option value="priceHigh">가격 높은순</option>
+          <option value="rating">평점 높은순</option>
         </select>
-        <select name="priceRange" value={filters.priceRange} onChange={handleFilterChange} className="p-2 border rounded">
-          {priceRanges.map(range => <option key={range.value} value={range.value}>{range.label}</option>)}
-        </select>
-        <select name="days" value={filters.days} onChange={handleFilterChange} className="p-2 border rounded">
-          {dayRanges.map(range => <option key={range.value} value={range.value}>{range.label}</option>)}
-        </select>
-        <select name="type" value={filters.type} onChange={handleFilterChange} className="p-2 border rounded">
-          {packageTypes.map(type => <option key={type.value} value={type.value}>{type.label}</option>)}
-        </select>
-        <div className="ml-auto">
-          <select value={sortBy} onChange={handleSortChange} className="p-2 border rounded">
-            <option value="recommended">추천순</option>
-            <option value="priceLow">가격 낮은순</option>
-            <option value="priceHigh">가격 높은순</option>
-            <option value="rating">평점 높은순</option>
-          </select>
-        </div>
       </div>
 
       {/* Package List */}
@@ -247,7 +163,7 @@ const Packages = () => {
           filteredPackages.map((pkg) => (
             <div key={pkg.id} className="border rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
               <Link to={`/package/${pkg.id}`}>
-                <img src={pkg.image_url || 'https://via.placeholder.com/400x300'} alt={pkg.name} className="w-full h-48 object-cover" />
+                <img src={pkg.image || 'https://via.placeholder.com/400x300'} alt={pkg.name} className="w-full h-48 object-cover" />
                 <div className="p-4">
                   <h2 className="text-xl font-bold">{pkg.name}</h2>
                   <p className="text-gray-600">{pkg.destination}</p>
