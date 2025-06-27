@@ -59,24 +59,33 @@ const Packages = () => {
         let categoryFound = false;
 
         if (category) {
-          // DB에 저장된 url이 '/best' 형태일 수 있으므로, 앞의 '/'를 제거하고 비교합니다.
-          const parentCategory = menuItems.find(m => m.url.replace(/^\//, '') === category && m.parent_id === null);
+          // URL 파라미터를 소문자로 변환하여 대소문자 구분 없이 비교
+          const categoryLower = category.toLowerCase();
+          
+          // 상위 카테고리 찾기 (e.g., /best)
+          const parentCategory = menuItems.find(m => 
+            m.url.replace(/^\//, '').toLowerCase() === categoryLower && m.parent_id === null
+          );
           
           if (parentCategory) {
             categoryFound = true;
             title = parentCategory.name;
             
-            // 서브 카테고리 처리
+            // 하위 카테고리 처리 (e.g., /best/japan)
             if (subcategory) {
-              // 다양한 URL 형식에 대응하기 위해 여러 조건을 검사합니다.
-              // 1. 정확히 일치하는 경우
-              // 2. 슬래시를 제거한 경우 
-              // 3. 전체 URL 경로에 parent/child 형태로 저장된 경우
-              const childCategory = menuItems.find(m => 
-                (m.url.replace(/^\//, '') === subcategory && m.parent_id === parentCategory.id) ||  // 기본 URL 매칭
-                (m.url === `${category}/${subcategory}` && m.parent_id === parentCategory.id) ||    // 전체 경로 매칭
-                (m.name === subcategory && m.parent_id === parentCategory.id)                       // 이름으로 매칭
-              );
+              const subcategoryLower = subcategory.toLowerCase();
+              
+              // 하위 카테고리를 URL 경로의 마지막 부분과 비교하여 찾기
+              const childCategory = menuItems.find(m => {
+                if (m.parent_id !== parentCategory.id) return false;
+                
+                // m.url을 정규화 (e.g., '/best/japan' -> 'best/japan')
+                const normalizedUrl = m.url.toLowerCase().replace(/^\//, '');
+                const urlParts = normalizedUrl.split('/');
+                const lastUrlPart = urlParts[urlParts.length - 1];
+                
+                return lastUrlPart === subcategoryLower;
+              });
               
               if (childCategory) {
                 query = query.eq('category', childCategory.name);
@@ -84,15 +93,15 @@ const Packages = () => {
               } else {
                 console.warn(`Subcategory "${subcategory}" not found for parent "${category}"`);
                 setError(`'${subcategory}' 하위 카테고리를 찾을 수 없습니다.`);
-                categoryFound = false; // 유효하지 않은 카테고리로 처리
+                categoryFound = false; // 유효하지 않은 하위 카테고리
               }
-            } else { // 메인 카테고리 처리
+            } else { // 메인 카테고리만 있는 경우
               const childCategories = menuItems.filter(m => m.parent_id === parentCategory.id);
               if (childCategories.length > 0) {
                 const categoryNames = childCategories.map(c => c.name);
                 query = query.in('category', categoryNames);
               } else {
-                // 하위 카테고리가 없는 메인 카테고리 (e.g. 국내숙소)
+                // 하위 카테고리가 없는 메인 카테고리
                 query = query.eq('category', parentCategory.name);
               }
             }
