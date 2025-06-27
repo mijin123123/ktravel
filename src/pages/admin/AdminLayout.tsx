@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 
@@ -9,7 +8,7 @@ const AdminLayout = () => {
     { path: '/admin/users', name: '회원 관리' },
     { path: '/admin/bookings', name: '예약 관리' },
     { path: '/admin/products', name: '상품 관리' },
-    { path: '/admin/accounts', name: '계좌 관리' },
+    { path: '/admin/account', name: '계좌 관리' },
     { path: '/admin/footer', name: '푸터 수정' },
   ];
 

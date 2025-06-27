@@ -46,7 +46,7 @@ function App() {
 
         {/* 상품 관련 페이지 */}
         <Route path="/packages" element={<Packages />} />
-        <Route path="/product/:id" element={<PackageDetail />} />
+        <Route path="/package/:id" element={<PackageDetail />} />
 
         {/* 동적 카테고리 라우트 */}
         {/* /best, /domestic, /best/europe 같은 모든 카테고리/서브카테고리 경로를 처리합니다. */}
