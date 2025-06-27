@@ -1,7 +1,7 @@
 [
     {
         "name": "베스트",
-        "url": "best.html",
+        "url": "/best",
         "order": "1",
         "sub": [
             { "name": "유럽", "order": "1" },
@@ -12,7 +12,7 @@
     },
     {
         "name": "해외여행",
-        "url": "packages.html",
+        "url": "/packages",
         "order": "2",
         "sub": [
             { "name": "가족 여행", "order": "1" },
@@ -23,7 +23,7 @@
     },
     {
         "name": "호텔",
-        "url": "hotels.html",
+        "url": "/hotels",
         "order": "3",
         "sub": [
             { "name": "5성급 호텔", "order": "1" },
@@ -33,7 +33,7 @@
     },
     {
         "name": "투어/입장권",
-        "url": "tours-tickets.html",
+        "url": "/tours-tickets",
         "order": "4",
         "sub": [
             { "name": "명소 입장권", "order": "1" },
@@ -43,7 +43,7 @@
     },
     {
         "name": "국내숙소",
-        "url": "domestic.html",
+        "url": "/domestic",
         "order": "5",
         "sub": [
             { "name": "제주도", "order": "1" },
@@ -54,7 +54,7 @@
     },
     {
         "name": "골프",
-        "url": "golf.html",
+        "url": "/golf",
         "order": "6",
         "sub": [
             { "name": "국내 골프", "order": "1" },
@@ -63,7 +63,7 @@
     },
     {
         "name": "테마여행",
-        "url": "theme.html",
+        "url": "/theme",
         "order": "7",
         "sub": [
             { "name": "크루즈", "order": "1" },
@@ -73,7 +73,7 @@
     },
     {
         "name": "맞춤여행",
-        "url": "custom.html",
+        "url": "/custom",
         "order": "8",
         "sub": [
             { "name": "개인 맞춤", "order": "1" },
@@ -82,7 +82,7 @@
     },
     {
         "name": "이달의 혜택",
-        "url": "benefits.html",
+        "url": "/benefits",
         "order": "9",
         "sub": [
             { "name": "특가 상품", "order": "1" },
