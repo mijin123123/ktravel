@@ -25,13 +25,10 @@ const Packages = () => {
   // Fetch all menu items once to use for category mapping
   useEffect(() => {
     const fetchMenu = async () => {
-      console.log('Fetching menu items...');
       const { data, error } = await supabase.from('menu').select('*');
-      
       if (error) {
         console.error('Error fetching menu:', error);
       } else {
-        console.log('Menu items fetched:', data?.length || 0);
         setMenuItems(data || []);
       }
     };
@@ -41,9 +38,7 @@ const Packages = () => {
   // Fetch packages based on URL parameters
   useEffect(() => {
     const fetchPackagesByCategory = async () => {
-      // 메뉴 아이템이 로드될 때까지 기다립니다.
       if (menuItems.length === 0) {
-        // URL에 카테고리가 지정되었지만 메뉴가 아직 로드되지 않은 경우
         if (category) {
           setPageTitle('메뉴 로딩 중...');
         }
@@ -56,84 +51,60 @@ const Packages = () => {
       try {
         let query = supabase.from('products').select('*');
         let title = '전체 여행 상품';
-        let categoryFound = false;
+        let performQuery = true;
 
         if (category) {
           const categoryLower = category.toLowerCase();
           const subcategoryLower = subcategory?.toLowerCase();
+          const urlPath = ('/' + [category, subcategory].filter(Boolean).join('/')).toLowerCase();
 
-          let matchedCategory: MenuCategory | undefined;
-          let parentForTitle: MenuCategory | undefined;
+          let matchedCategory = menuItems.find((m: MenuCategory) => m.url && m.url.toLowerCase() === urlPath);
 
-          // 1. 하위 카테고리가 있는 경우 (e.g., /best/japan)
-          if (subcategoryLower) {
-            const parent = menuItems.find(m => 
-              m.url.replace(/^\//, '').toLowerCase() === categoryLower && m.parent_id === null
-            );
-            if (parent) {
-              parentForTitle = parent;
-              const child = menuItems.find(m => {
-                if (m.parent_id !== parent.id) return false;
+          if (!matchedCategory) {
+            const lastUrlSegment = subcategoryLower || categoryLower;
+            const potentialMatches = menuItems.filter((m: MenuCategory) => {
                 if (!m.url) return false;
-                const lastUrlSegment = m.url.toLowerCase().replace(/^\//, '').split('/').pop();
-                return lastUrlSegment === subcategoryLower;
-              });
-              if (child) {
-                matchedCategory = child;
-              }
-            }
-          } else { // 2. 단일 카테고리인 경우 (e.g., /best 또는 /japan)
-            // URL의 마지막 경로 세그먼트와 일치하는 메뉴를 찾습니다.
-            // 이렇게 하면 /japan, /theme/honeymoon 등 다양한 URL 구조에 대응할 수 있습니다.
-            matchedCategory = menuItems.find(m => {
-              if (!m.url) return false;
-              const url = m.url.replace(/^\//, '').toLowerCase();
-              const lastSegment = url.substring(url.lastIndexOf('/') + 1);
-              return lastSegment === categoryLower;
+                const menuUrl = m.url.toLowerCase().replace(/\/$/, '');
+                const lastMenuSegment = menuUrl.substring(menuUrl.lastIndexOf('/') + 1);
+                return lastMenuSegment === lastUrlSegment;
             });
-            
-            if (matchedCategory && matchedCategory.parent_id) {
-              parentForTitle = menuItems.find(m => m.id === matchedCategory.parent_id);
+
+            if (potentialMatches.length === 1) {
+                matchedCategory = potentialMatches[0];
+            } else if (potentialMatches.length > 1) {
+                console.warn(`'${lastUrlSegment}'에 대한 모호한 메뉴 경로가 존재합니다. 첫 번째 항목을 사용합니다.`);
+                matchedCategory = potentialMatches[0];
             }
           }
 
           if (matchedCategory) {
-            categoryFound = true;
+            const parentForTitle = matchedCategory.parent_id 
+              ? menuItems.find((m: MenuCategory) => m.id === matchedCategory!.parent_id)
+              : undefined;
+
             title = parentForTitle 
                 ? `${parentForTitle.name} > ${matchedCategory.name}` 
                 : matchedCategory.name;
 
-            // 찾은 카테고리가 하위 카테고리를 가지는지 확인 (즉, 부모 카테고리인지)
-            const children = menuItems.filter(m => m.parent_id === matchedCategory.id);
+            const children = menuItems.filter((m: MenuCategory) => m.parent_id === matchedCategory!.id);
             if (children.length > 0) {
-              // 부모 카테고리이면, 모든 하위 카테고리의 상품을 조회
-              const categoryNames = children.map(c => c.name);
-              query = query.in('category', categoryNames);
+              const childCategoryNames = children.map((c: MenuCategory) => c.name);
+              query = query.in('category', childCategoryNames);
             } else {
-              // 최하위 카테고리(leaf node)이면, 해당 카테고리의 상품만 조회
               query = query.eq('category', matchedCategory.name);
             }
+          } else {
+            performQuery = false;
+            setError(`'${subcategory || category}' 카테고리 정보를 찾을 수 없습니다.`);
+            setAllPackages([]);
           }
-        } else {
-          // URL에 카테고리가 없으면 전체 상품 표시
-          categoryFound = true; 
         }
+        
+        setPageTitle(title);
 
-        if (category && !categoryFound) {
-          // URL에 카테고리가 있지만 메뉴에서 찾지 못한 경우
-          console.error(`Category or subcategory not found for: /${category}${subcategory ? '/' + subcategory : ''}`);
-          setError(`'${subcategory || category}' 카테고리 정보를 찾을 수 없습니다.`);
-          setPageTitle('오류');
-          setAllPackages([]);
-        } else {
-          // 정상적으로 쿼리 실행
-          setPageTitle(title);
+        if (performQuery) {
           const { data, error: queryError } = await query.order('created_at', { ascending: false });
-
-          if (queryError) {
-            throw queryError;
-          }
-          
+          if (queryError) throw queryError;
           setAllPackages(data || []);
         }
 
@@ -152,10 +123,10 @@ const Packages = () => {
 
   // Apply user filters and sorting
   useEffect(() => {
-    let result = [...allPackages];
+    let result: TravelPackage[] = [...allPackages];
 
     if (filters.region) {
-      result = result.filter((pkg) => pkg.destination.toLowerCase().includes(filters.region));
+      result = result.filter((pkg) => pkg.destination.toLowerCase().includes(filters.region.toLowerCase()));
     }
     if (filters.priceRange) {
       const [minStr, maxStr] = filters.priceRange.split('-');
@@ -215,51 +186,53 @@ const Packages = () => {
   ];
 
   const dayRanges = [
-    { value: '', label: '모든 일수' },
-    { value: '1-3', label: '1-3일' },
-    { value: '4-7', label: '4-7일' },
+    { value: '', label: '모든 일정' },
+    { value: '1-3', label: '3일 이하' },
+    { value: '4-5', label: '4-5일' },
+    { value: '6-7', label: '6-7일' },
     { value: '8-', label: '8일 이상' },
   ];
 
   const packageTypes = [
-    { value: '', label: '모든 유형' },
-    { value: 'culture', label: '문화 탐방' },
-    { value: 'beach', label: '휴양/해변' },
-    { value: 'city', label: '도시 여행' },
-    { value: 'honeymoon', label: '허니문' },
+    { value: '', label: '모든 타입' },
+    { value: '패키지', label: '패키지' },
+    { value: '허니문', label: '허니문' },
+    { value: '골프', label: '골프' },
+    { value: '크루즈', label: '크루즈' },
   ];
 
-  const regions = [
-    { value: '', label: '모든 지역' },
-    { value: 'europe', label: '유럽' },
-    { value: 'asia', label: '아시아' },
-    { value: 'oceania', label: '오세아니아' },
-    { value: 'america', label: '미주/중남미' },
-  ];
+  if (isLoading) {
+    return <div className="container mx-auto px-4 py-8">페이지 로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div className="container mx-auto px-4 py-8 text-red-500">오류: {error}</div>;
+  }
 
   return (
-    <div className="container-custom">
-      <div className="bg-gray-200 h-48 flex items-center justify-center my-8">
-        <h1 className="text-4xl font-bold">{pageTitle}</h1>
-      </div>
-
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8 p-4 bg-gray-50 rounded-lg">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full md:w-auto">
-          <select name="region" value={filters.region} onChange={handleFilterChange} className="p-2 border rounded-md">
-            {regions.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-          </select>
-          <select name="priceRange" value={filters.priceRange} onChange={handleFilterChange} className="p-2 border rounded-md">
-            {priceRanges.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-          </select>
-          <select name="days" value={filters.days} onChange={handleFilterChange} className="p-2 border rounded-md">
-            {dayRanges.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-          </select>
-          <select name="type" value={filters.type} onChange={handleFilterChange} className="p-2 border rounded-md">
-            {packageTypes.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-          </select>
-        </div>
-        <div className="mt-4 md:mt-0">
-          <select value={sortBy} onChange={handleSortChange} className="p-2 border rounded-md">
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-4">{pageTitle}</h1>
+      
+      {/* Filter and Sort Controls */}
+      <div className="bg-gray-100 p-4 rounded-lg mb-8 flex flex-wrap items-center gap-4">
+        <select name="region" value={filters.region} onChange={handleFilterChange} className="p-2 border rounded">
+          <option value="">모든 지역</option>
+          {/* TODO: 지역 목록 동적 생성 */}
+          <option value="일본">일본</option>
+          <option value="동남아">동남아</option>
+          <option value="유럽">유럽</option>
+        </select>
+        <select name="priceRange" value={filters.priceRange} onChange={handleFilterChange} className="p-2 border rounded">
+          {priceRanges.map(range => <option key={range.value} value={range.value}>{range.label}</option>)}
+        </select>
+        <select name="days" value={filters.days} onChange={handleFilterChange} className="p-2 border rounded">
+          {dayRanges.map(range => <option key={range.value} value={range.value}>{range.label}</option>)}
+        </select>
+        <select name="type" value={filters.type} onChange={handleFilterChange} className="p-2 border rounded">
+          {packageTypes.map(type => <option key={type.value} value={type.value}>{type.label}</option>)}
+        </select>
+        <div className="ml-auto">
+          <select value={sortBy} onChange={handleSortChange} className="p-2 border rounded">
             <option value="recommended">추천순</option>
             <option value="priceLow">가격 낮은순</option>
             <option value="priceHigh">가격 높은순</option>
@@ -268,49 +241,40 @@ const Packages = () => {
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-12">
-          <p className="text-lg">상품 목록을 불러오는 중입니다...</p>
-        </div>
-      ) : error ? (
-        <div className="text-center py-12 text-red-500">
-          <p>오류가 발생했습니다: {error}</p>
-        </div>
-      ) : filteredPackages.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredPackages.map((pkg) => (
-            <Link to={`/product/${pkg.id}`} key={pkg.id} className="border rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <img src={pkg.image} alt={pkg.name} className="w-full h-48 object-cover" />
-              <div className="p-4">
-                <div className="flex justify-between items-center mb-2">
-                  <p className="text-sm text-gray-500">{pkg.destination}</p>
-                  <div className="flex items-center">
-                    <svg className="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                    <span className="text-sm">{pkg.rating.toFixed(1)}</span>
+      {/* Package List */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {filteredPackages.length > 0 ? (
+          filteredPackages.map((pkg) => (
+            <div key={pkg.id} className="border rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <Link to={`/package/${pkg.id}`}>
+                <img src={pkg.image_url || 'https://via.placeholder.com/400x300'} alt={pkg.name} className="w-full h-48 object-cover" />
+                <div className="p-4">
+                  <h2 className="text-xl font-bold">{pkg.name}</h2>
+                  <p className="text-gray-600">{pkg.destination}</p>
+                  <div className="flex items-center mt-2">
+                    <span className="text-yellow-500">{'★'.repeat(Math.round(pkg.rating))}{'☆'.repeat(5 - Math.round(pkg.rating))}</span>
+                    <span className="ml-2 text-sm text-gray-500">({pkg.rating.toFixed(1)})</span>
+                  </div>
+                  <div className="mt-4">
+                    {pkg.discountRate > 0 && (
+                      <span className="text-gray-500 line-through mr-2">
+                        {pkg.price.toLocaleString()}원
+                      </span>
+                    )}
+                    <span className="text-red-500 font-bold text-lg">
+                      {(pkg.price * (1 - pkg.discountRate)).toLocaleString()}원
+                    </span>
                   </div>
                 </div>
-                <h3 className="font-bold text-lg mb-2 truncate">{pkg.name}</h3>
-                <div className="flex justify-end items-center">
-                  {pkg.discountRate > 0 && (
-                    <span className="text-red-500 font-bold text-lg mr-2">
-                      {Math.round(pkg.discountRate * 100)}%
-                    </span>
-                  )}
-                  <span className="text-gray-900 font-bold text-xl">
-                    {(pkg.price * (1 - pkg.discountRate)).toLocaleString()}원
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-lg text-gray-500">해당 카테고리의 상품이 없습니다.</p>
-        </div>
-      )}
+              </Link>
+            </div>
+          ))
+        ) : (
+          <p>해당 조건에 맞는 상품이 없습니다.</p>
+        )}
+      </div>
     </div>
   );
-}
+};
 
 export default Packages;

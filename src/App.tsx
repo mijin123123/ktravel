@@ -18,6 +18,7 @@ import UserManagement from './pages/admin/UserManagement'
 import BookingManagement from './pages/admin/BookingManagement'
 import AccountManagement from './pages/admin/AccountManagement'
 import FooterManagement from './pages/admin/FooterManagement'
+import MenuManagement from './pages/admin/MenuManagement'
 
 // 일반 사용자용 레이아웃
 const PublicLayout = () => (
@@ -58,6 +59,7 @@ function App() {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="products" element={<ProductManagement />} />
+        <Route path="menu" element={<MenuManagement />} />
         <Route path="users" element={<UserManagement />} />
         <Route path="bookings" element={<BookingManagement />} />
         <Route path="account" element={<AccountManagement />} />
