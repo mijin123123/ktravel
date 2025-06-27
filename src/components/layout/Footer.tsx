@@ -29,7 +29,14 @@ const Footer = () => {
     return <footer className="bg-gray-900 text-white p-4 text-center">Loading footer...</footer>;
   }
 
-  const { description, packages, company, customerCenter, social } = footerContent;
+  // 데이터가 없을 경우를 대비하여 기본값을 설정합니다.
+  const { 
+    description = "", 
+    packages = { title: "", links: [] }, 
+    company = { title: "", links: [] }, 
+    customerCenter = { title: "", info: [] }, 
+    social = [] 
+  } = footerContent;
 
   const socialIcons: { [key: string]: JSX.Element } = {
     Instagram: (
