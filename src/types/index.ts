@@ -129,3 +129,48 @@ export interface MenuCategory {
   parent_id: number | null;
   sub?: MenuCategory[]; // 가공 후 서브메뉴를 담을 속성
 }
+
+// --- 관리자 페이지 타입 ---
+
+// 사용자 프로필 타입 (Supabase auth와 연동)
+export interface UserProfile {
+  id: string; // Supabase auth user UUID
+  email?: string;
+  full_name?: string;
+  role: 'admin' | 'user';
+  created_at?: string;
+}
+
+// 예약 정보 타입
+export interface Booking {
+  id: number;
+  created_at: string;
+  user_id: string;
+  product_id: number;
+  start_date: string;
+  end_date: string;
+  status: 'pending' | 'confirmed' | 'cancelled';
+  total_price: number;
+  // 테이블 조인을 통해 가져온 추가 정보
+  users?: { full_name: string; email: string };
+  products?: { name: string };
+}
+
+// 회사 계좌 정보 타입
+export interface AccountInfo {
+  id: number;
+  bank_name: string;
+  account_number: string;
+  account_holder: string;
+}
+
+// 푸터 정보 타입
+export interface FooterInfo {
+  id: number;
+  company_name: string;
+  address: string;
+  phone_number: string;
+  business_registration_number: string;
+  terms_url: string;
+  privacy_policy_url: string;
+}

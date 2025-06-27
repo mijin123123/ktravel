@@ -59,55 +59,59 @@ const Packages = () => {
         let categoryFound = false;
 
         if (category) {
-          // URL 파라미터를 소문자로 변환하여 대소문자 구분 없이 비교
           const categoryLower = category.toLowerCase();
-          
-          // 상위 카테고리 찾기 (e.g., /best)
-          const parentCategory = menuItems.find(m => 
-            m.url.replace(/^\//, '').toLowerCase() === categoryLower && m.parent_id === null
-          );
-          
-          if (parentCategory) {
-            categoryFound = true;
-            title = parentCategory.name;
-            
-            // 하위 카테고리 처리 (e.g., /best/japan)
-            if (subcategory) {
-              const subcategoryLower = subcategory.toLowerCase();
-              
-              // 하위 카테고리를 URL 경로의 마지막 부분을 이용해 찾기
-              const childCategory = menuItems.find(m => {
-                // 1. 올바른 부모의 자식인지 확인
-                if (m.parent_id !== parentCategory.id) return false;
-                
-                // 2. URL이 유효한지 확인
+          const subcategoryLower = subcategory?.toLowerCase();
+
+          let matchedCategory: MenuCategory | undefined;
+          let parentForTitle: MenuCategory | undefined;
+
+          // 1. 하위 카테고리가 있는 경우 (e.g., /best/japan)
+          if (subcategoryLower) {
+            const parent = menuItems.find(m => 
+              m.url.replace(/^\//, '').toLowerCase() === categoryLower && m.parent_id === null
+            );
+            if (parent) {
+              parentForTitle = parent;
+              const child = menuItems.find(m => {
+                if (m.parent_id !== parent.id) return false;
                 if (!m.url) return false;
-                
-                // 3. URL 경로의 마지막 부분이 subcategory와 일치하는지 확인
-                // e.g., /best/japan -> japan, /japan -> japan
-                const normalizedUrl = m.url.toLowerCase().replace(/^\//, '');
-                const lastUrlSegment = normalizedUrl.substring(normalizedUrl.lastIndexOf('/') + 1);
-                
+                const lastUrlSegment = m.url.toLowerCase().replace(/^\//, '').split('/').pop();
                 return lastUrlSegment === subcategoryLower;
               });
-              
-              if (childCategory) {
-                query = query.eq('category', childCategory.name);
-                title = `${parentCategory.name} > ${childCategory.name}`;
-              } else {
-                console.warn(`Subcategory "${subcategory}" not found for parent "${category}"`);
-                setError(`'${subcategory}' 하위 카테고리를 찾을 수 없습니다.`);
-                categoryFound = false; // 유효하지 않은 하위 카테고리
+              if (child) {
+                matchedCategory = child;
               }
-            } else { // 메인 카테고리만 있는 경우
-              const childCategories = menuItems.filter(m => m.parent_id === parentCategory.id);
-              if (childCategories.length > 0) {
-                const categoryNames = childCategories.map(c => c.name);
-                query = query.in('category', categoryNames);
-              } else {
-                // 하위 카테고리가 없는 메인 카테고리
-                query = query.eq('category', parentCategory.name);
-              }
+            }
+          } else { // 2. 단일 카테고리인 경우 (e.g., /best 또는 /japan)
+            // URL의 마지막 경로 세그먼트와 일치하는 메뉴를 찾습니다.
+            // 이렇게 하면 /japan, /theme/honeymoon 등 다양한 URL 구조에 대응할 수 있습니다.
+            matchedCategory = menuItems.find(m => {
+              if (!m.url) return false;
+              const url = m.url.replace(/^\//, '').toLowerCase();
+              const lastSegment = url.substring(url.lastIndexOf('/') + 1);
+              return lastSegment === categoryLower;
+            });
+            
+            if (matchedCategory && matchedCategory.parent_id) {
+              parentForTitle = menuItems.find(m => m.id === matchedCategory.parent_id);
+            }
+          }
+
+          if (matchedCategory) {
+            categoryFound = true;
+            title = parentForTitle 
+                ? `${parentForTitle.name} > ${matchedCategory.name}` 
+                : matchedCategory.name;
+
+            // 찾은 카테고리가 하위 카테고리를 가지는지 확인 (즉, 부모 카테고리인지)
+            const children = menuItems.filter(m => m.parent_id === matchedCategory.id);
+            if (children.length > 0) {
+              // 부모 카테고리이면, 모든 하위 카테고리의 상품을 조회
+              const categoryNames = children.map(c => c.name);
+              query = query.in('category', categoryNames);
+            } else {
+              // 최하위 카테고리(leaf node)이면, 해당 카테고리의 상품만 조회
+              query = query.eq('category', matchedCategory.name);
             }
           }
         } else {

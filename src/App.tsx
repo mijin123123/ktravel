@@ -9,14 +9,15 @@ import Contact from './pages/Contact'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import NotFound from './pages/NotFound'
+
+// 새로운 관리자 페이지 컴포넌트 임포트
 import AdminLayout from './pages/admin/AdminLayout'
 import Dashboard from './pages/admin/Dashboard'
-import AdminMenu from './pages/admin/AdminMenu'
-import ManageUsers from './pages/admin/ManageUsers'
-import ManageBookings from './pages/admin/ManageBookings'
-import ManageProducts from './pages/admin/ManageProducts'
-import ManageAccounts from './pages/admin/ManageAccounts'
-import EditFooter from './pages/admin/EditFooter'
+import ProductManagement from './pages/admin/ProductManagement'
+import UserManagement from './pages/admin/UserManagement'
+import BookingManagement from './pages/admin/BookingManagement'
+import AccountManagement from './pages/admin/AccountManagement'
+import FooterManagement from './pages/admin/FooterManagement'
 
 // 일반 사용자용 레이아웃
 const PublicLayout = () => (
@@ -56,12 +57,11 @@ function App() {
       {/* --- 관리자 페이지 --- */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
-        <Route path="menu" element={<AdminMenu />} />
-        <Route path="users" element={<ManageUsers />} />
-        <Route path="bookings" element={<ManageBookings />} />
-        <Route path="products" element={<ManageProducts />} />
-        <Route path="accounts" element={<ManageAccounts />} />
-        <Route path="footer" element={<EditFooter />} />
+        <Route path="products" element={<ProductManagement />} />
+        <Route path="users" element={<UserManagement />} />
+        <Route path="bookings" element={<BookingManagement />} />
+        <Route path="account" element={<AccountManagement />} />
+        <Route path="footer" element={<FooterManagement />} />
       </Route>
 
       {/* --- 404 페이지 --- */}
