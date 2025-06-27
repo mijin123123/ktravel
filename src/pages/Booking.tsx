@@ -1,11 +1,12 @@
 // src/pages/Booking.tsx
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { TravelPackage } from '../types';
 
 const Booking = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const packageId = searchParams.get('packageId');
   const date = searchParams.get('date');
   const travelers = searchParams.get('travelers');
@@ -55,6 +56,15 @@ const Booking = () => {
 
   const totalPrice = pkg.price * (1 - pkg.discountRate) * Number(travelers || 1);
 
+  const handlePayment = () => {
+    const params = new URLSearchParams();
+    params.set('packageName', pkg.name);
+    params.set('totalPrice', totalPrice.toString());
+    params.set('date', date || '');
+    params.set('travelers', travelers || '');
+    navigate(`/payment?${params.toString()}`);
+  };
+
   return (
     <div className="container-custom py-12">
       <h1 className="text-4xl font-bold mb-8">예약 확정</h1>
@@ -80,7 +90,10 @@ const Booking = () => {
               <span className="text-xl font-bold">총 결제 금액</span>
               <span className="text-xl font-bold text-blue-600">{totalPrice.toLocaleString()}원</span>
             </div>
-            <button className="mt-6 w-full bg-blue-600 text-white py-3 rounded-md font-bold hover:bg-blue-700 transition-colors">
+            <button 
+              onClick={handlePayment}
+              className="mt-6 w-full bg-blue-600 text-white py-3 rounded-md font-bold hover:bg-blue-700 transition-colors"
+            >
               결제하기
             </button>
           </div>
