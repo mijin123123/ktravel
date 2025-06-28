@@ -28,18 +28,26 @@ document.addEventListener('DOMContentLoaded', async function() {
 async function loadCommonComponents() {
     try {
         const cacheBuster = `?v=${Date.now()}`;
-        const headerPromise = fetch(`/header.html${cacheBuster}`).then(res => res.text());
+        // index.html에는 이미 헤더가 포함되어 있으므로 헤더는 현재 페이지가 index.html이 아닐 경우에만 불러옵니다.
+        const isIndexPage = window.location.pathname === '/' || window.location.pathname.includes('index.html');
+        
+        let headerPromise = Promise.resolve('');
+        if (!isIndexPage) {
+            headerPromise = fetch(`/header.html${cacheBuster}`).then(res => res.text());
+        }
+        
         const footerPromise = fetch(`/footer.html${cacheBuster}`).then(res => res.text());
-
         const [headerHTML, footerHTML] = await Promise.all([headerPromise, footerPromise]);
 
         const headerEl = document.getElementById('main-header');
         const footerEl = document.getElementById('main-footer');
         const appEl = document.getElementById('app');
 
-        if (headerEl) {
+        // 헤더는 index.html이 아닐 경우에만 동적으로 삽입합니다.
+        if (headerEl && !isIndexPage) {
             headerEl.innerHTML = headerHTML;
         }
+        
         if (footerEl) {
             footerEl.innerHTML = footerHTML;
             applyFooterData(); // 관리자 페이지에서 수정한 푸터 정보 적용
