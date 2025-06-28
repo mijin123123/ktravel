@@ -29,7 +29,7 @@ const Packages = () => {
     fetchMenu();
   }, []);
 
-  // Fetch packages based on URL parameters
+  // Fetch packages based on URL parameters and subscribe to realtime changes
   useEffect(() => {
     const fetchPackagesByCategory = async () => {
       if (menuItems.length === 0) {
@@ -113,6 +113,43 @@ const Packages = () => {
 
     fetchPackagesByCategory();
 
+    const channel = supabase
+      .channel('public:products')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products' },
+        (payload) => {
+          console.log('상품 테이블 변경 감지:', payload);
+          // fetchPackagesByCategory(); // 전체 목록을 다시 불러오는 대신, 변경된 내용만 상태에 직접 반영합니다.
+
+          const updatedPackage = payload.new as TravelPackage;
+
+          if (payload.eventType === 'INSERT') {
+            // 새 상품이 추가되면, 현재 카테고리와 일치할 경우에만 목록의 맨 앞에 추가합니다.
+            // (카테고리 필터링이 복잡하므로, 일단은 전체를 다시 불러오는 것이 나을 수 있습니다. 
+            // 하지만 실시간 업데이트를 위해 직접 수정을 시도합니다.)
+            fetchPackagesByCategory(); // 카테고리 필터링 로직 때문에 다시 fetch 하는 것이 안전합니다.
+          } else if (payload.eventType === 'UPDATE') {
+            // 상품이 수정되면, 목록에서 해당 상품을 찾아 정보를 업데이트합니다.
+            setAllPackages(currentPackages =>
+              currentPackages.map(pkg =>
+                pkg.id === updatedPackage.id ? updatedPackage : pkg
+              )
+            );
+          } else if (payload.eventType === 'DELETE') {
+            // 상품이 삭제되면, 목록에서 해당 상품을 제거합니다.
+            const deletedPackage = payload.old as Partial<TravelPackage>;
+            setAllPackages(currentPackages =>
+              currentPackages.filter(pkg => pkg.id !== deletedPackage.id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [category, subcategory, menuItems]);
 
   // Apply user sorting
