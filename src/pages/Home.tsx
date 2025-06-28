@@ -5,18 +5,18 @@ const Home = () => {
   const [isVisible, setIsVisible] = useState(false);
   
   const destinations = [
-    { name: '산토리니, 그리스', image: '/images/santorini.jpg', tag: '인기', color: 'bg-purple-600' },
-    { name: '교토, 일본', image: '/images/kyoto.jpg', tag: '추천', color: 'bg-green-600' },
-    { name: '발리, 인도네시아', image: '/images/bali.jpg', tag: '신규', color: 'bg-orange-600' }
+    { name: '오로라, 핀란드', image: '/images/aurora.jpg', tag: '꿈의 여행', color: 'bg-blue-500', description: '밤하늘을 수놓는 경이로운 오로라를 직접 경험해보세요.' },
+    { name: '마추픽추, 페루', image: '/images/machu-picchu.jpg', tag: '고대 유적', color: 'bg-emerald-600', description: '잉카 제국의 신비로운 공중 도시, 마추픽추로 떠나는 시간 여행.' },
+    { name: '사하라 사막, 모로코', image: '/images/sahara.jpg', tag: '이색 체험', color: 'bg-amber-600', description: '붉은 모래 언덕과 밤하늘의 별, 사하라에서 잊지 못할 하룻밤.' },
+    { name: '베네치아, 이탈리아', image: '/images/venice.jpg', tag: '로맨틱', color: 'bg-rose-500', description: '물의 도시 베네치아에서 곤돌라를 타고 낭만적인 순간을 만끽하세요.' }
   ];
 
   useEffect(() => {
     setIsVisible(true);
     
-    // 슬라이드 자동 전환
     const interval = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % destinations.length);
-    }, 5000);
+    }, 7000); // 슬라이드 전환 시간을 7초로 늘려 각 슬라이드를 충분히 볼 수 있도록 합니다.
     
     return () => clearInterval(interval);
   }, []);
@@ -24,23 +24,21 @@ const Home = () => {
   return (
     <div className="bg-neutral-50 min-h-screen text-gray-800 overflow-x-hidden">
       {/* 다이내믹 히어로 섹션 */}
-      <section className="relative h-[85vh] overflow-hidden">
-        <div className="absolute inset-0 flex transition-transform duration-1000 ease-in-out"
-             style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
-          {destinations.map((destination, index) => (
-            <div key={index} className="relative w-full h-full flex-shrink-0">
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30 z-10"></div>
-              <img 
-                src={destination.image} 
-                alt={destination.name}
-                className="absolute inset-0 w-full h-full object-cover transform scale-110 animate-subtle-zoom"
-              />
-              <div className={`absolute top-6 left-6 ${destination.color} text-white text-xs font-bold px-3 py-1 rounded-full z-20`}>
-                {destination.tag}
-              </div>
-            </div>
-          ))}
-        </div>
+      <section className="relative h-[90vh] overflow-hidden text-white">
+        {destinations.map((destination, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${index === activeSlide ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent z-10"></div>
+            <img 
+              src={destination.image} 
+              alt={destination.name}
+              className="absolute inset-0 w-full h-full object-cover transform scale-100 transition-transform duration-[8000ms] ease-linear"
+              style={{ transform: index === activeSlide ? 'scale(1.15)' : 'scale(1)' }}
+            />
+          </div>
+        ))}
 
         {/* 슬라이드 컨트롤 */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
@@ -48,8 +46,8 @@ const Home = () => {
             <button
               key={index}
               onClick={() => setActiveSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all ${
-                index === activeSlide ? 'bg-white scale-125' : 'bg-white/50'
+              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                index === activeSlide ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white'
               }`}
               aria-label={`슬라이드 ${index + 1}로 이동`}
             />
@@ -57,40 +55,33 @@ const Home = () => {
         </div>
         
         {/* 메인 콘텐츠 */}
-        <div className="absolute inset-0 flex items-center z-10">
-          <div className={`container mx-auto px-6 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="max-w-3xl">
-              <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-6">
-                <span className="block">꿈꾸던 여행을</span>
-                <span className="block text-yellow-400">현실로 만드는 방법</span>
+        <div className="relative z-20 flex flex-col justify-center items-center h-full text-center px-6">
+          <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <div className="mb-8">
+              <span className={`inline-block px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-500 ${destinations[activeSlide].color}`}>
+                {destinations[activeSlide].tag}
+              </span>
+              <h1 className="text-5xl md:text-7xl font-extrabold leading-tight my-4 drop-shadow-lg">
+                {destinations[activeSlide].name}
               </h1>
-              <p className="text-xl md:text-2xl text-white/90 mb-10">
-                K-Travel과 함께라면 어디든 특별한 경험이 기다립니다
+              <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+                {destinations[activeSlide].description}
               </p>
-              
-              {/* 검색 바 */}
-              <div className="bg-white p-2 rounded-full flex flex-col md:flex-row shadow-xl">
-                <div className="flex-1 flex items-center px-4 py-2">
-                  <svg className="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <input 
-                    type="text" 
-                    placeholder="어디로 떠나고 싶으신가요?" 
-                    className="bg-transparent w-full focus:outline-none text-gray-700"
-                  />
-                </div>
-                <div className="md:border-l border-gray-300 flex items-center px-4 py-2">
-                  <svg className="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span className="text-gray-500">날짜 선택</span>
-                </div>
-                <button className="bg-gradient-to-r from-pink-600 to-purple-600 text-white px-8 py-3 rounded-full font-medium hover:from-pink-700 hover:to-purple-700 transition duration-300 mt-2 md:mt-0">
-                  여행 검색
-                </button>
+            </div>
+            
+            {/* 검색 바 */}
+            <div className="bg-white/20 backdrop-blur-md p-3 rounded-full flex flex-col md:flex-row items-center gap-2 max-w-3xl mx-auto shadow-2xl border border-white/30">
+              <div className="flex-1 flex items-center w-full md:w-auto px-4">
+                <svg className="w-6 h-6 text-white/80 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                <input 
+                  type="text" 
+                  placeholder="가고 싶은 도시나 나라를 검색해보세요" 
+                  className="bg-transparent w-full focus:outline-none text-white placeholder-white/70 text-lg"
+                />
               </div>
+              <button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white px-8 py-3 rounded-full font-bold hover:from-rose-600 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 w-full md:w-auto">
+                <span className="hidden md:inline">지금 </span>여행 떠나기
+              </button>
             </div>
           </div>
         </div>
@@ -105,12 +96,12 @@ const Home = () => {
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
+            {{
               { title: '해외여행', icon: '✈️', color: 'from-blue-500 to-indigo-600' },
               { title: '국내숙소', icon: '🏨', color: 'from-green-500 to-teal-600' },
               { title: '골프여행', icon: '⛳', color: 'from-yellow-500 to-amber-600' },
               { title: '럭셔리', icon: '💎', color: 'from-purple-500 to-pink-600' },
-            ].map((category, index) => (
+            }.map((category, index) => (
               <div key={index} className="group cursor-pointer">
                 <div className={`bg-gradient-to-br ${category.color} rounded-2xl p-6 md:p-8 text-center text-white shadow-lg group-hover:shadow-xl transition duration-300 transform group-hover:-translate-y-1`}>
                   <div className="text-4xl md:text-5xl mb-4">{category.icon}</div>
