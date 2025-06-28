@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { Booking } from '../../types'; // Booking 타입을 정의해야 합니다.
 
@@ -48,7 +48,7 @@ const getBookings = async () => {
   return data;
 };
 
-const BookingManagement = () => {
+const BookingManagement: React.FC = () => {
   const [bookings, setBookings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

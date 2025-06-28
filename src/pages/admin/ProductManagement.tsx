@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { TravelPackage } from '../../types';
 
-const ProductManagement = () => {
+const ProductManagement: React.FC = () => {
   const [products, setProducts] = useState<TravelPackage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +64,7 @@ const ProductManagement = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     
-    // 숫자 필드는 숫자로 변환
+    // 숫자 필드는 숫으로 변환
     if (type === 'number') {
       setCurrentProduct({
         ...currentProduct,

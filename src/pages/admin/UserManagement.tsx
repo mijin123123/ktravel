@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { User } from '@supabase/supabase-js';
 
@@ -74,7 +74,7 @@ const deleteUser = async (userId: string) => {
   }
 };
 
-const UserManagement = () => {
+const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
