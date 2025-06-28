@@ -45,7 +45,7 @@ const ProductManagement = () => {
       category: '',
       description: '',
       price: 0,
-      discountRate: 0,
+      discount_rate: 0,
       rating: 5.0,
       image: 'https://via.placeholder.com/400x300'
     });
@@ -89,7 +89,7 @@ const ProductManagement = () => {
         return;
       }
 
-      // 데이터 준비 (컬럼명 주의: discountRate -> discount_rate 변환 가능성)
+      // 데이터 준비 (컬럼명: 스네이크 케이스로 변환)
       // 스키마에 맞는 형태로 데이터 구조화
       const productData = {
         name: currentProduct.name,
@@ -97,8 +97,8 @@ const ProductManagement = () => {
         category: currentProduct.category || '',
         description: currentProduct.description || '',
         price: currentProduct.price || 0,
-        // discountRate 또는 discount_rate 중 테이블에 맞는 이름 사용
-        discountRate: currentProduct.discountRate || 0, // 테이블 구조 확인 후 필요시 수정
+        // discount_rate로 변경 (스네이크 케이스 사용)
+        discount_rate: currentProduct.discountRate || 0,
         rating: currentProduct.rating || 5.0,
         image: currentProduct.image || 'https://via.placeholder.com/400x300'
       };
@@ -221,9 +221,9 @@ const ProductManagement = () => {
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{product.category || '-'}</td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                   {product.price?.toLocaleString()}원
-                  {product.discountRate > 0 && (
+                  {product.discount_rate > 0 && (
                     <span className="ml-2 text-red-500 text-xs">
-                      ({product.discountRate * 100}% 할인)
+                      ({product.discount_rate * 100}% 할인)
                     </span>
                   )}
                 </td>
@@ -336,8 +336,8 @@ const ProductManagement = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-1">할인율 (0~1)</label>
                       <input
                         type="number"
-                        name="discountRate"
-                        value={currentProduct.discountRate || 0}
+                        name="discount_rate"
+                        value={currentProduct.discount_rate || currentProduct.discountRate || 0}
                         onChange={handleChange}
                         min="0"
                         max="1"
