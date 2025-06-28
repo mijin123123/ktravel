@@ -387,8 +387,3 @@ const Home = () => {
 };
 
 export default Home;
-    </div>
-  );
-};
-
-export default Home;
