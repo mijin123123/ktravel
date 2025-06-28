@@ -89,45 +89,64 @@ const ProductManagement = () => {
         return;
       }
 
+      // 데이터 준비 (컬럼명 주의: discountRate -> discount_rate 변환 가능성)
+      // 스키마에 맞는 형태로 데이터 구조화
+      const productData = {
+        name: currentProduct.name,
+        destination: currentProduct.destination,
+        category: currentProduct.category || '',
+        description: currentProduct.description || '',
+        price: currentProduct.price || 0,
+        // discountRate 또는 discount_rate 중 테이블에 맞는 이름 사용
+        discountRate: currentProduct.discountRate || 0, // 테이블 구조 확인 후 필요시 수정
+        rating: currentProduct.rating || 5.0,
+        image: currentProduct.image || 'https://via.placeholder.com/400x300'
+      };
+
+      console.log('저장할 데이터:', productData);
+
+      let result;
+
       // 편집 모드: 기존 상품 수정
       if (isEditing && currentProduct.id) {
-        const { error } = await supabase
+        console.log('수정 요청 ID:', currentProduct.id);
+        
+        // 직접 API 호출 (RPC 없이)
+        result = await supabase
           .from('products')
-          .update({
-            name: currentProduct.name,
-            destination: currentProduct.destination,
-            category: currentProduct.category,
-            description: currentProduct.description,
-            price: currentProduct.price,
-            discountRate: currentProduct.discountRate || 0,
-            rating: currentProduct.rating || 5.0,
-            image: currentProduct.image
-          })
+          .update(productData)
           .eq('id', currentProduct.id);
 
-        if (error) throw error;
+        if (result.error) {
+          console.error('수정 오류:', result.error);
+          throw result.error;
+        }
         alert('상품이 수정되었습니다.');
+        
+        // UI 업데이트 (API 호출 없이)
+        setProducts(prevProducts => 
+          prevProducts.map(product => 
+            product.id === currentProduct.id 
+              ? { ...product, ...productData, id: currentProduct.id } 
+              : product
+          )
+        );
       } 
       // 신규 모드: 새 상품 추가
       else {
-        // id 필드를 제외한 나머지 필드만 전송 (id는 자동 생성)
-        const { name, destination, category, description, price, discountRate, rating, image } = currentProduct;
-        
-        const { error } = await supabase
+        // 직접 API 호출 (RPC 없이)
+        result = await supabase
           .from('products')
-          .insert([{ 
-            name, 
-            destination, 
-            category, 
-            description, 
-            price, 
-            discountRate: discountRate || 0, 
-            rating: rating || 5.0, 
-            image: image || 'https://via.placeholder.com/400x300'
-          }]);
+          .insert([productData]);
 
-        if (error) throw error;
+        if (result.error) {
+          console.error('추가 오류:', result.error);
+          throw result.error;
+        }
         alert('상품이 추가되었습니다.');
+        
+        // 새로운 상품으로 목록 전체 새로고침
+        fetchProducts();
       }
 
       // 모달 닫고 상품 목록 새로고침
@@ -146,15 +165,22 @@ const ProductManagement = () => {
     }
     
     try {
+      console.log('삭제 요청 ID:', id); // 디버깅용
+      
+      // 직접 삭제 API 호출 (RPC 없이)
       const { error } = await supabase
         .from('products')
         .delete()
         .eq('id', id);
       
-      if (error) throw error;
+      if (error) {
+        console.error('삭제 오류:', error);
+        throw error;
+      }
       
       alert('상품이 삭제되었습니다.');
-      fetchProducts(); // 목록 새로고침
+      // 삭제된 항목을 UI에서 즉시 제거 (API 호출 없이)
+      setProducts(prevProducts => prevProducts.filter(product => product.id !== id));
     } catch (err) {
       console.error('상품 삭제 실패:', err);
       alert('상품을 삭제하는 중 오류가 발생했습니다.');
