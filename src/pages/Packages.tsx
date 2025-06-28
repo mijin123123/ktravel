@@ -114,7 +114,7 @@ const Packages = () => {
     fetchPackagesByCategory();
 
     const channel = supabase
-      .channel('public:products')
+      .channel('realtime-product-updates') // 디버깅을 위해 채널 이름 변경
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'products' },
@@ -123,7 +123,13 @@ const Packages = () => {
           fetchPackagesByCategory(); // 데이터가 변경되면 상품 목록을 다시 불러옵니다.
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        // 실시간 구독 상태를 로깅하여 연결 문제를 진단합니다.
+        console.log('Supabase 실시간 구독 상태:', status);
+        if (err) {
+          console.error('Supabase 실시간 구독 에러:', err);
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
