@@ -49,12 +49,16 @@ const deleteUser = async (userId: string) => {
     console.error('Error deleting user:', error);
     throw error;
   }
+  
+  // 삭제가 성공했음을 명시적으로 반환
+  return { success: true };
 };
 
 const UserManagement = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchUsers = async () => {
     setIsLoading(true);
@@ -76,11 +80,18 @@ const UserManagement = () => {
   const handleDeleteUser = async (userId: string) => {
     if (window.confirm('정말로 이 회원을 삭제하시겠습니까? 되돌릴 수 없습니다.')) {
       try {
+        setIsDeleting(true);
+        // 삭제 작업이 완료될 때까지 명시적으로 대기
         await deleteUser(userId);
+
+        // 삭제 성공 시 UI에서도 직접 해당 사용자를 제거
+        setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
         alert('회원이 삭제되었습니다.');
-        fetchUsers(); // 목록 새로고침
       } catch (err) {
         alert('회원 삭제 중 오류가 발생했습니다.');
+        console.error('Error deleting user:', err);
+      } finally {
+        setIsDeleting(false);
       }
     }
   };
