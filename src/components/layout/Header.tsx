@@ -1,48 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { MenuCategory } from '../../types';
-import { supabase } from '../../lib/supabaseClient';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [menuData, setMenuData] = useState<MenuCategory[]>([]);
-  const [activeMenu, setActiveMenu] = useState<number | null>(null);
   const location = useLocation();
-
-  useEffect(() => {
-    const fetchMenuData = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('menu')
-          .select('*')
-          .order('order', { ascending: true });
-
-        if (error) throw error;
-
-        // Supabase에서 가져온 평면 데이터를 계층 구조로 가공
-        const topLevelMenus = data.filter(item => item.parent_id === null);
-        const subMenus = data.filter(item => item.parent_id !== null);
-
-        const hierarchicalMenu = topLevelMenus.map(menu => ({
-          ...menu,
-          sub: subMenus.filter(subMenu => subMenu.parent_id === menu.id)
-                       .sort((a, b) => a.order - b.order),
-        }));
-
-        setMenuData(hierarchicalMenu);
-      } catch (error) {
-        console.error("메뉴 데이터 로딩 실패:", error);
-        setMenuData([]);
-      }
-    };
-
-    fetchMenuData();
-  }, []);
-
+  
+  const navigation = [
+    { name: '홈', href: '/' },
+    { name: '여행 패키지', href: '/packages' },
+    { name: '회사 소개', href: '/about' },
+    { name: '문의하기', href: '/contact' },
+  ];
+  
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
+    <header className="bg-white shadow-sm">
       <div className="container-custom">
         <div className="flex items-center justify-between h-16">
           {/* 로고 */}
@@ -53,42 +26,23 @@ const Header = () => {
           </div>
           
           {/* 데스크탑 네비게이션 */}
-          <nav className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              {menuData.map((item) => (
-                <div 
-                  key={item.id} 
-                  className="relative"
-                  onMouseEnter={() => item.sub && item.sub.length > 0 && setActiveMenu(item.id)}
-                  onMouseLeave={() => item.sub && item.sub.length > 0 && setActiveMenu(null)}
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-center space-x-4">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    isActive(item.href)
+                      ? 'bg-primary-50 text-primary-700'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
                 >
-                  <Link
-                    to={item.url}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                      isActive(item.url)
-                        ? 'bg-primary-50 text-primary-700'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    {item.name}
-                  </Link>
-                  {item.sub && item.sub.length > 0 && activeMenu === item.id && (
-                    <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1">
-                      {item.sub.map((subItem) => (
-                        <Link
-                          key={subItem.id}
-                          to={subItem.url}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          {subItem.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                  {item.name}
+                </Link>
               ))}
             </div>
-          </nav>
+          </div>
           
           {/* 로그인/회원가입 버튼 */}
           <div className="hidden md:flex items-center space-x-2">
@@ -135,34 +89,19 @@ const Header = () => {
       {/* 모바일 메뉴 */}
       <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          {menuData.map((item) => (
-            <div key={item.id} className="relative">
-              <Link
-                to={item.url}
-                className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  isActive(item.url)
-                    ? 'bg-primary-50 text-primary-700'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
-              {item.sub && item.sub.length > 0 && (
-                <div className="mt-2 ml-4 space-y-1">
-                  {item.sub.map((subItem) => (
-                    <Link
-                      key={subItem.id}
-                      to={subItem.url}
-                      className="block px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {subItem.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+          {navigation.map((item) => (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                isActive(item.href)
+                  ? 'bg-primary-50 text-primary-700'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {item.name}
+            </Link>
           ))}
         </div>
         <div className="pt-4 pb-3 border-t border-gray-200">
