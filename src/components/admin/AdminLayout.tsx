@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
-const AdminLayout: React.FC = () => {
+interface AdminLayoutProps {
+  children?: ReactNode;
+}
+
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const location = useLocation();
 
   const getPageTitle = () => {
@@ -74,7 +78,7 @@ const AdminLayout: React.FC = () => {
         </header>
         <main className="flex-1 p-8 overflow-y-auto">
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <Outlet />
+            {children || <Outlet />}
           </div>
         </main>
       </div>
