@@ -8,12 +8,20 @@ const AdminLayout: React.FC = () => {
     switch (location.pathname) {
       case '/admin':
         return '대시보드';
+      case '/admin/users':
+        return '회원 관리';
+      case '/admin/products':
+        return '상품 관리';
+      case '/admin/bookings':
+        return '예약 관리';
+      case '/admin/menus':
+        return '메뉴 관리';
       case '/admin/categories':
         return '카테고리 관리';
       case '/admin/footer':
-        return '푸터 정보 수정';
+        return '푸터 정보 관리';
       default:
-        return 'Admin';
+        return 'K-Travel 관리자';
     }
   };
 
@@ -35,12 +43,16 @@ const AdminLayout: React.FC = () => {
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Sidebar */}
       <aside className="w-64 bg-gray-800 text-white flex flex-col flex-shrink-0">
-        <div className="p-4 text-2xl font-bold">Admin Panel</div>
+        <div className="p-4 text-2xl font-bold">K-Travel Admin</div>
         <nav className="flex-grow">
           <ul>
             <NavLink to="/admin">대시보드</NavLink>
+            <NavLink to="/admin/users">회원 관리</NavLink>
+            <NavLink to="/admin/products">상품 관리</NavLink>
+            <NavLink to="/admin/bookings">예약 관리</NavLink>
+            <NavLink to="/admin/menus">메뉴 관리</NavLink>
             <NavLink to="/admin/categories">카테고리 관리</NavLink>
-            <NavLink to="/admin/footer">푸터 정보 수정</NavLink>
+            <NavLink to="/admin/footer">푸터 정보</NavLink>
           </ul>
         </nav>
         <div>
@@ -49,11 +61,6 @@ const AdminLayout: React.FC = () => {
               <Link to="/" className="block p-4 hover:bg-gray-700">
                 사이트로 돌아가기
               </Link>
-            </li>
-            <li>
-              <button className="w-full text-left p-4 hover:bg-gray-700">
-                로그아웃
-              </button>
             </li>
           </ul>
         </div>
