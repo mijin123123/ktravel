@@ -96,12 +96,12 @@ const Home = () => {
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {{
+            {[
               { title: '해외여행', icon: '✈️', color: 'from-blue-500 to-indigo-600' },
               { title: '국내숙소', icon: '🏨', color: 'from-green-500 to-teal-600' },
               { title: '골프여행', icon: '⛳', color: 'from-yellow-500 to-amber-600' },
               { title: '럭셔리', icon: '💎', color: 'from-purple-500 to-pink-600' },
-            }.map((category, index) => (
+            ].map((category, index) => (
               <div key={index} className="group cursor-pointer">
                 <div className={`bg-gradient-to-br ${category.color} rounded-2xl p-6 md:p-8 text-center text-white shadow-lg group-hover:shadow-xl transition duration-300 transform group-hover:-translate-y-1`}>
                   <div className="text-4xl md:text-5xl mb-4">{category.icon}</div>
