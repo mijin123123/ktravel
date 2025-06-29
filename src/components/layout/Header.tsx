@@ -21,7 +21,7 @@ const Header = () => {
           {/* 로고 */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
-              <span className="text-2xl font-bold text-primary-600 font-serif">TRIP STORE</span>
+              <span className="text-2xl font-bold text-primary-600 font-serif">K-Travel</span>
             </Link>
           </div>
           

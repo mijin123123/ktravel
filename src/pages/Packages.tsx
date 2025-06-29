@@ -250,7 +250,7 @@ const Packages = () => {
         {/* 페이지 제목 */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">여행 패키지</h1>
-          <p className="text-gray-600">TRIP STORE가 제공하는 다양한 해외여행 패키지입니다.</p>
+          <p className="text-gray-600">K-Travel이 제공하는 다양한 해외여행 패키지입니다.</p>
         </div>
         
         {/* 필터 및 정렬 섹션 */}

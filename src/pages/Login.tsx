@@ -27,7 +27,7 @@ const Login = () => {
     <div className="bg-gray-50 min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          TRIP STORE 로그인
+          K-Travel 로그인
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           계정이 없으신가요?{' '}

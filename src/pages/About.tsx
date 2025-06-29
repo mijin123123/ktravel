@@ -6,9 +6,9 @@ const About = () => {
       {/* 회사 소개 헤더 */}
       <section className="bg-gray-900 text-white">
         <div className="container-custom py-20">
-          <h1 className="text-4xl font-bold mb-6">TRIP STORE 소개</h1>
+          <h1 className="text-4xl font-bold mb-6">K-Travel 소개</h1>
           <p className="text-xl text-gray-300 max-w-2xl">
-            최고의 해외여행 경험을 제공하는 TRIP STORE는 2010년 설립 이래 고객님의 특별한 순간을 함께해왔습니다.
+            최고의 해외여행 경험을 제공하는 K-Travel은 2010년 설립 이래 고객님의 특별한 순간을 함께해왔습니다.
           </p>
         </div>
       </section>
@@ -20,7 +20,7 @@ const About = () => {
             <div>
               <h2 className="text-3xl font-bold mb-6 text-gray-800">우리의 비전</h2>
               <p className="text-gray-600 mb-4">
-                TRIP STORE는 고객의 꿈을 실현하는 여행을 만들어 갑니다. 우리는 단순한 여행 상품을 판매하는 것이 아니라, 
+                K-Travel은 고객의 꿈을 실현하는 여행을 만들어 갑니다. 우리는 단순한 여행 상품을 판매하는 것이 아니라, 
                 삶의 특별한 경험과 추억을 선사합니다.
               </p>
               <p className="text-gray-600">
@@ -91,7 +91,7 @@ const About = () => {
                 <h3 className="text-xl font-bold text-primary-600">2010년</h3>
               </div>
               <div className="md:w-3/4">
-                <h4 className="text-lg font-semibold mb-2">TRIP STORE 설립</h4>
+                <h4 className="text-lg font-semibold mb-2">K-Travel 설립</h4>
                 <p className="text-gray-600">
                   서울 강남에 본사 설립. 해외여행 전문 여행사로 첫 발걸음을 내딛다.
                 </p>
@@ -162,7 +162,7 @@ const About = () => {
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-4">함께 특별한 여행을 만들어보세요</h2>
             <p className="text-white text-opacity-90 mb-6">
-              TRIP STORE와 함께라면, 평생 간직할 수 있는 특별한 추억이 됩니다.
+              K-Travel과 함께라면, 평생 간직할 수 있는 특별한 추억이 됩니다.
               지금 바로 상담을 신청하고 여행 계획을 시작하세요.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">

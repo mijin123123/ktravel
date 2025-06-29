@@ -465,7 +465,7 @@ const PackageDetail = () => {
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="mb-4 md:mb-0">
               <h3 className="text-xl font-bold mb-2">궁금한 점이 있으신가요?</h3>
-              <p className="text-gray-600">TRIP STORE의 전문 상담원이 도와드립니다.</p>
+              <p className="text-gray-600">K-Travel의 전문 상담원이 도와드립니다.</p>
             </div>
             <div className="flex space-x-4">
               <Link to="/contact" className="btn btn-primary">

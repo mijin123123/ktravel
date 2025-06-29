@@ -68,7 +68,7 @@ const Contact = () => {
                     <h3 className="font-medium text-gray-900 mb-1">주소</h3>
                     <p className="text-gray-600">
                       서울특별시 강남구 테헤란로 123<br />
-                      TRIP STORE 빌딩 8층
+                      K-Travel 빌딩 8층
                     </p>
                   </div>
                   

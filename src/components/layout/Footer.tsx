@@ -9,7 +9,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <Link to="/" className="flex items-center mb-4">
-              <span className="text-xl font-bold text-white">TRIP STORE</span>
+              <span className="text-xl font-bold text-white">K-Travel</span>
             </Link>
             <p className="text-gray-400 text-sm">
               최고의 해외여행 전문 여행사입니다. 고객님의 특별한 여행을 위해 최선을 다하겠습니다.
@@ -70,7 +70,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-          <p>&copy; {currentYear} TRIP STORE. 모든 권리 보유.</p>
+          <p>&copy; {currentYear} K-Travel. 모든 권리 보유.</p>
         </div>
       </div>
     </footer>

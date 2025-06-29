@@ -87,7 +87,7 @@ const Register = () => {
     <div className="bg-gray-50 min-h-screen py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          <span className="text-primary-600 font-serif">TRIP STORE</span> 회원가입
+          <span className="text-primary-600 font-serif">K-Travel</span> 회원가입
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           이미 계정이 있으신가요?{' '}
@@ -247,7 +247,7 @@ const Register = () => {
                 </div>
                 <div className="ml-3 text-sm">
                   <label htmlFor="agreeMarketing" className="font-medium text-gray-700">마케팅 정보 수신 동의</label>
-                  <p className="text-xs text-gray-500"><span className="font-semibold text-primary-600 font-serif">TRIP STORE</span>의 다양한 여행 상품 및 이벤트 정보를 수신합니다. (선택)</p>
+                  <p className="text-xs text-gray-500"><span className="font-semibold text-primary-600 font-serif">K-Travel</span>의 다양한 여행 상품 및 이벤트 정보를 수신합니다. (선택)</p>
                 </div>
               </div>
             </div>
