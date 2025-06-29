@@ -68,3 +68,18 @@ export interface Booking {
   createdAt: string;
   paymentStatus: 'pending' | 'partial' | 'complete';
 }
+
+// 상품 인터페이스
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  rating: number;
+  reviews: number;
+  discount?: number;
+  originalPrice?: number;
+  tags?: string[];
+}

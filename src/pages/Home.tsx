@@ -24,7 +24,7 @@ const Home = () => {
   return (
     <div className="bg-neutral-50 min-h-screen text-gray-800 overflow-x-hidden">
       {/* 다이내믹 히어로 섹션 */}
-      <section className="relative h-[90vh] overflow-hidden text-white">
+      <section className="relative h-[70vh] overflow-hidden text-white">
         {destinations.map((destination, index) => (
           <div
             key={index}
