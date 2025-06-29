@@ -83,3 +83,10 @@ export interface Product {
   originalPrice?: number;
   tags?: string[];
 }
+
+// 메뉴 아이템 타입
+export interface Menu {
+  name: string;
+  href: string;
+  subMenu?: Menu[];
+}

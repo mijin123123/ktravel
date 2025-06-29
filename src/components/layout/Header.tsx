@@ -1,17 +1,12 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useMenu } from '../../hooks/useMenu';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  
-  const navigation = [
-    { name: '홈', href: '/' },
-    { name: '여행 패키지', href: '/packages' },
-    { name: '회사 소개', href: '/about' },
-    { name: '문의하기', href: '/contact' },
-  ];
-  
+  const { menu, loading, error } = useMenu();
+
   const isActive = (path: string) => location.pathname === path;
 
   return (
@@ -21,14 +16,16 @@ const Header = () => {
           {/* 로고 */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
-              <span className="text-2xl font-bold text-primary-600 font-serif">K-Travel</span>
+              <span className="text-2xl font-bold text-gray-800 font-serif">TRIP STORE</span>
             </Link>
           </div>
           
           {/* 데스크탑 네비게이션 */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-4">
-              {navigation.map((item) => (
+              {loading && <p>Loading...</p>}
+              {error && <p>Error loading menu</p>}
+              {menu.map((item) => (
                 <Link
                   key={item.name}
                   to={item.href}
@@ -44,6 +41,20 @@ const Header = () => {
             </div>
           </div>
           
+          {/* 검색창 */}
+          <div className="hidden md:flex items-center ml-6">
+            <div className="relative">
+              <input 
+                type="text" 
+                placeholder="도시나 상품을 검색해보세요" 
+                className="w-64 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              </svg>
+            </div>
+          </div>
+
           {/* 로그인/회원가입 버튼 */}
           <div className="hidden md:flex items-center space-x-2">
             <Link to="/login" className="btn btn-secondary">
@@ -89,7 +100,7 @@ const Header = () => {
       {/* 모바일 메뉴 */}
       <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          {navigation.map((item) => (
+          {menu.map((item) => (
             <Link
               key={item.name}
               to={item.href}
